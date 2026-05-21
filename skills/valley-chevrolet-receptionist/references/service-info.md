@@ -1,110 +1,48 @@
-# Valley Chevrolet Service Center — Service Information
+# Valley Chevrolet — Quick Reference
 
-> **Note:** Verify all details below with Valley Chevrolet management and update before going live.
+> Update the phone number and email below before going live.
 
-## Location & Contact
+## Contact & Hours
 
-| Field | Value |
-|-------|-------|
-| Address | 700 Kidder Street, Wilkes-Barre, PA 18702 |
-| Phone | (570) 823-XXXX ← update with real number |
-| Service Email | service@valleychevrolet.com ← update |
-| Website | valleychevrolet.com ← update |
+| | |
+|---|---|
+| **Address** | 700 Kidder Street, Wilkes-Barre, PA 18702 |
+| **Phone** | (570) 823-XXXX ← *replace with real number* |
+| **Email** | service@valleychevrolet.com ← *replace if different* |
+| **Mon–Fri** | 7:30 AM – 6:00 PM |
+| **Saturday** | 7:30 AM – 4:00 PM |
+| **Sunday** | Closed |
 
-## Service Hours
+## Services
 
-| Day | Hours |
-|-----|-------|
-| Monday – Friday | 7:30 AM – 6:00 PM |
-| Saturday | 7:30 AM – 4:00 PM |
-| Sunday | Closed |
+- Oil change (regular and synthetic)
+- Tire rotation, balance, flat repair, new tires, wheel alignment
+- Brake pads, rotors, brake fluid
+- Check engine light / engine diagnostic
+- Battery and alternator
+- AC and heater repair
+- Transmission and fluid services
+- State inspection and emissions (PA)
+- GM factory recalls — **always free**
+- Courtesy loaner cars (request when booking)
+- Local shuttle service
 
-## Services Offered
+## Common Questions
 
-### Routine Maintenance
-- Oil & filter change (conventional, synthetic blend, full synthetic)
-- Tire rotation & balance
-- Multi-point inspection
-- Air filter replacement (cabin + engine)
-- Wiper blade replacement
-- Battery test & replacement
-- Fluid top-off / flush (coolant, brake, transmission, power steering)
+**Do I need an appointment?**
+Recommended. Walk-ins welcome for simple services but may wait longer.
 
-### Brake Service
-- Brake pad replacement
-- Rotor resurfacing / replacement
-- Brake fluid flush
-- Caliper inspection & replacement
+**How long is an oil change?**
+About 45–60 minutes with an appointment.
 
-### Tire Services
-- New tire sales & installation (Chevy OEM + major brands)
-- Flat repair
-- TPMS service
-- Wheel alignment
+**Do you have loaner cars?**
+Yes — request one when you book. Subject to availability.
 
-### Engine & Drivetrain
-- Engine diagnostic (CEL / check engine light)
-- Spark plug replacement
-- Timing belt / chain service
-- Transmission service
-- Differential service
-- Transfer case service (4WD/AWD)
+**Do you work on non-Chevy cars?**
+We specialize in GM vehicles (Chevy, GMC, Buick, Cadillac) but can handle basic maintenance on most cars.
 
-### Electrical & HVAC
-- AC recharge & leak diagnosis
-- Heating system repair
-- Battery & charging system test
-- Starter / alternator replacement
+**Are recalls free?**
+Yes, all GM factory recalls are no charge.
 
-### Body & Safety
-- Windshield chip repair / replacement
-- Recall repairs (GM factory recalls — always free)
-- State inspection & emissions testing (PA)
-
-### Warranty & Special Programs
-- GM Powertrain Warranty service
-- GM Extended Protection (extended warranty)
-- Certified Pre-Owned (CPO) inspections
-- Courtesy loaner vehicles available (call ahead)
-- Shuttle service within local area
-
-## Estimated Pricing (Ranges — Always Recommend Advisor Quote)
-
-| Service | Typical Range |
-|---------|---------------|
-| Conventional oil change | $39–$55 |
-| Synthetic oil change | $69–$99 |
-| Tire rotation | $19–$25 (free with oil change) |
-| Brake pads (per axle) | $150–$300+ |
-| Battery replacement | $120–$220 |
-| State inspection | $45–$65 |
-| AC recharge | $100–$200 |
-| Wheel alignment | $89–$129 |
-
-**Policy:** Never quote a firm price without a service advisor confirmation. Use ranges only when asked, and always add: *"A service advisor can give you an exact quote — would you like us to call you?"*
-
-## Frequently Asked Questions
-
-**Q: Do I need an appointment?**
-A: Appointments are strongly recommended. Express service (oil change, tire rotation) accepts walk-ins when bays are open, but wait times may be longer.
-
-**Q: How long does an oil change take?**
-A: Typically 45–60 minutes with an appointment; up to 90 minutes for walk-ins.
-
-**Q: Do you offer loaner cars?**
-A: Yes, loaner vehicles are available for qualifying repairs. Please request when scheduling — subject to availability.
-
-**Q: Do you service non-Chevrolet vehicles?**
-A: We specialize in GM vehicles (Chevy, GMC, Buick, Cadillac) but can perform general maintenance on most makes.
-
-**Q: How do I check the status of my repair?**
-A: Your service advisor will contact you directly. You can also call the service desk at our main number during business hours.
-
-**Q: Are GM recalls free?**
-A: Yes. All GM factory recalls are performed at no charge to the owner.
-
-**Q: Do you offer a shuttle service?**
-A: Yes, within the local Wilkes-Barre / Kingston / Scranton area.
-
-**Q: What payment methods do you accept?**
-A: Visa, MasterCard, American Express, Discover, cash, and financing through GM Financial.
+**How do I check repair status?**
+Call the service desk or wait for your advisor to call you.
