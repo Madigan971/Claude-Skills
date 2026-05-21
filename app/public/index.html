@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Services – Get a Free Estimate</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #1e40af;
+      --blue-light: #3b82f6;
+      --blue-bg: #eff6ff;
+      --orange: #ea580c;
+      --orange-light: #fb923c;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-400: #9ca3af;
+      --gray-600: #4b5563;
+      --gray-800: #1f2937;
+      --green: #16a34a;
+      --green-bg: #f0fdf4;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+    .logo-icon { font-size: 28px; }
+    .header-badge {
+      background: var(--green-bg);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .header-badge::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--blue) 0%, #1e3a8a 100%);
+      color: white;
+      padding: 48px 24px 64px;
+      text-align: center;
+    }
+    .hero h1 { font-size: clamp(26px, 5vw, 40px); font-weight: 800; margin-bottom: 12px; line-height: 1.2; }
+    .hero p { font-size: 17px; opacity: 0.9; max-width: 520px; margin: 0 auto 24px; }
+    .hero-features {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+    .hero-feature {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    /* Services bar */
+    .services-bar {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 12px 24px;
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .service-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--gray-200);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      background: white;
+    }
+    .service-chip:hover, .service-chip.active {
+      border-color: var(--blue-light);
+      background: var(--blue-bg);
+      color: var(--blue);
+    }
+
+    /* Chat container */
+    .chat-wrapper {
+      max-width: 720px;
+      margin: -32px auto 40px;
+      padding: 0 16px;
+      width: 100%;
+    }
+
+    .chat-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--blue-light), var(--blue));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .chat-header-info strong { font-size: 14px; color: var(--gray-800); display: block; }
+    .chat-header-info span { font-size: 12px; color: var(--green); }
+    .typing-indicator { display: none; align-items: center; gap: 4px; margin-left: auto; }
+    .typing-indicator.show { display: flex; }
+    .typing-dot {
+      width: 6px; height: 6px;
+      background: var(--gray-400);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.16s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.32s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); }
+      40% { transform: scale(1); }
+    }
+
+    .messages {
+      flex: 1;
+      min-height: 360px;
+      max-height: 440px;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message.user { flex-direction: row-reverse; }
+
+    .message-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .message.ai .message-avatar {
+      background: linear-gradient(135deg, var(--blue-light), var(--blue));
+    }
+    .message.user .message-avatar {
+      background: var(--orange);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .bubble {
+      max-width: 78%;
+      padding: 11px 15px;
+      border-radius: 16px;
+      font-size: 14.5px;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    .message.ai .bubble {
+      background: var(--gray-100);
+      color: var(--gray-800);
+      border-bottom-left-radius: 4px;
+    }
+    .message.user .bubble {
+      background: var(--blue);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .qualified-banner {
+      background: var(--green-bg);
+      border: 1.5px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-align: center;
+      margin: 4px 0;
+    }
+    .qualified-banner strong { color: var(--green); display: block; font-size: 15px; margin-bottom: 4px; }
+    .qualified-banner p { font-size: 13px; color: #166534; }
+
+    /* Input */
+    .chat-input-wrap {
+      padding: 14px 16px;
+      border-top: 1px solid var(--gray-200);
+      background: white;
+    }
+
+    .quick-replies {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .quick-reply {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1.5px solid var(--blue-light);
+      color: var(--blue);
+      font-size: 12.5px;
+      cursor: pointer;
+      background: var(--blue-bg);
+      transition: all 0.1s;
+      font-weight: 500;
+    }
+    .quick-reply:hover { background: var(--blue-light); color: white; }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    textarea {
+      flex: 1;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      line-height: 1.4;
+      min-height: 44px;
+      max-height: 120px;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+    textarea:focus { border-color: var(--blue-light); }
+    textarea::placeholder { color: var(--gray-400); }
+
+    .send-btn {
+      width: 44px; height: 44px;
+      background: var(--blue);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      flex-shrink: 0;
+      color: white;
+      font-size: 18px;
+    }
+    .send-btn:hover { background: var(--blue-light); }
+    .send-btn:disabled { background: var(--gray-400); cursor: not-allowed; }
+
+    /* Trust bar */
+    .trust-bar {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 20px 16px;
+      font-size: 13px;
+      color: var(--gray-600);
+    }
+    .trust-item { display: flex; align-items: center; gap: 6px; }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .hero { padding: 32px 16px 52px; }
+      .messages { max-height: 360px; }
+      .bubble { max-width: 88%; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-icon">🏠</span>
+    <span>ProHome Services</span>
+  </div>
+  <div class="header-badge">Available Now</div>
+</header>
+
+<div class="hero">
+  <h1>Get a Free Estimate in Minutes</h1>
+  <p>Tell us what you need — our AI assistant will connect you with the right technician fast.</p>
+  <div class="hero-features">
+    <div class="hero-feature">⚡ Instant Response</div>
+    <div class="hero-feature">🔧 Licensed & Insured</div>
+    <div class="hero-feature">⭐ 5-Star Service</div>
+  </div>
+</div>
+
+<div class="services-bar">
+  <div class="service-chip active" onclick="selectService(this, 'HVAC repair')">❄️ AC Repair</div>
+  <div class="service-chip" onclick="selectService(this, 'heating repair')">🔥 Heating</div>
+  <div class="service-chip" onclick="selectService(this, 'HVAC installation')">🏭 New Install</div>
+  <div class="service-chip" onclick="selectService(this, 'HVAC maintenance tune-up')">🔩 Tune-Up</div>
+  <div class="service-chip" onclick="selectService(this, 'plumbing issue')">🚿 Plumbing</div>
+  <div class="service-chip" onclick="selectService(this, 'electrical issue')">💡 Electrical</div>
+</div>
+
+<div class="chat-wrapper">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="avatar">🤖</div>
+      <div class="chat-header-info">
+        <strong>Alex – Service Coordinator</strong>
+        <span>● Online · Responds instantly</span>
+      </div>
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="chat-input-wrap">
+      <div class="quick-replies" id="quickReplies">
+        <button class="quick-reply" onclick="sendQuick('My AC is not cooling')">AC not cooling</button>
+        <button class="quick-reply" onclick="sendQuick('Furnace not working')">Furnace issue</button>
+        <button class="quick-reply" onclick="sendQuick('Need a new HVAC unit')">New install</button>
+        <button class="quick-reply" onclick="sendQuick('Annual maintenance check')">Maintenance</button>
+      </div>
+      <div class="input-row">
+        <textarea id="userInput" placeholder="Describe your issue or question..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="trust-bar">
+    <div class="trust-item">🔒 Privacy protected</div>
+    <div class="trust-item">📞 No spam calls</div>
+    <div class="trust-item">✅ No obligation estimate</div>
+    <div class="trust-item">⚡ Same-day service available</div>
+  </div>
+</div>
+
+<script>
+  const sessionId = Math.random().toString(36).slice(2);
+  let conversationHistory = [];
+  let isQualified = false;
+  let selectedService = 'HVAC repair';
+
+  function selectService(chip, service) {
+    document.querySelectorAll('.service-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    selectedService = service;
+  }
+
+  function appendMessage(role, text) {
+    const container = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'message-avatar';
+    avatarEl.textContent = role === 'ai' ? '🤖' : 'Me';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+
+    div.appendChild(avatarEl);
+    div.appendChild(bubble);
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function showQualifiedBanner() {
+    const container = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'qualified-banner';
+    div.innerHTML = `
+      <strong>✅ Your request has been received!</strong>
+      <p>A licensed technician will contact you within 30 minutes during business hours. For emergencies, call us directly at <strong>(555) 123-4567</strong>.</p>
+    `;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function setTyping(show) {
+    document.getElementById('typingIndicator').classList.toggle('show', show);
+    document.getElementById('sendBtn').disabled = show;
+    document.getElementById('userInput').disabled = show;
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  async function sendMessage(text) {
+    if (isQualified) return;
+    const input = document.getElementById('userInput');
+    const msg = (text || input.value).trim();
+    if (!msg) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('quickReplies').style.display = 'none';
+
+    appendMessage('user', msg);
+    conversationHistory.push({ role: 'user', content: msg });
+
+    setTyping(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: conversationHistory, sessionId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Server error');
+
+      conversationHistory.push({ role: 'assistant', content: data.message });
+      appendMessage('ai', data.message);
+
+      if (data.qualified && !isQualified) {
+        isQualified = true;
+        showQualifiedBanner();
+        document.getElementById('userInput').disabled = true;
+        document.getElementById('userInput').placeholder = 'Your request has been submitted.';
+      }
+    } catch (err) {
+      appendMessage('ai', '⚠️ Sorry, something went wrong. Please try again or call us at (555) 123-4567.');
+      console.error(err);
+    } finally {
+      setTyping(false);
+    }
+  }
+
+  function sendQuick(text) {
+    sendMessage(text);
+  }
+
+  // Initial greeting
+  async function startChat() {
+    setTyping(true);
+    try {
+      const greeting = 'Hi! I\'d like to get an estimate.';
+      conversationHistory.push({ role: 'user', content: greeting });
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: conversationHistory, sessionId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Server error');
+
+      conversationHistory.push({ role: 'assistant', content: data.message });
+      appendMessage('ai', data.message);
+    } catch {
+      appendMessage('ai', 'Hi! I\'m Alex, your service coordinator. What can I help you with today? Are you looking for AC repair, heating, plumbing, or another home service?');
+    } finally {
+      setTyping(false);
+    }
+  }
+
+  startChat();
+</script>
+</body>
+</html>
