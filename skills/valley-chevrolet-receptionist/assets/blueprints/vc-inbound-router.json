@@ -1,0 +1,235 @@
+{
+  "name": "VC Receptionist — Inbound Router",
+  "description": "Receives an inbound message (web chat webhook or email), sends it to Claude acting as the Valley Chevrolet AI receptionist, then routes the structured output to appointment booking or escalation scenarios.",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "hook": "{{WEBHOOK_ID}}",
+        "maxResults": 1
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": { "x": 0, "y": 0 },
+        "restore": {
+          "parameters": {
+            "hook": { "label": "VC Chat Webhook" }
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "http:ActionSendData",
+      "version": 3,
+      "parameters": { "handleErrors": true },
+      "mapper": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "method": "post",
+        "headers": [
+          { "name": "x-api-key", "value": "{{ANTHROPIC_API_KEY}}" },
+          { "name": "anthropic-version", "value": "2023-06-01" },
+          { "name": "content-type", "value": "application/json" }
+        ],
+        "bodyType": "raw",
+        "contentType": "application/json",
+        "body": "{\"model\":\"claude-sonnet-4-6\",\"max_tokens\":1024,\"system\":\"{{SKILL_SYSTEM_PROMPT}}\",\"messages\":[{\"role\":\"user\",\"content\":\"{{1.message}}\"}]}"
+      },
+      "metadata": {
+        "designer": { "x": 300, "y": 0 },
+        "restore": {},
+        "parameters": [
+          { "name": "handleErrors", "type": "boolean", "label": "Evaluate all states" }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "json:ParseJSON",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "json": "{{2.body}}",
+        "type": "auto"
+      },
+      "metadata": {
+        "designer": { "x": 600, "y": 0 }
+      }
+    },
+    {
+      "id": 4,
+      "module": "tools:SetVariable",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "name": "ai_response_text",
+        "scope": "roundtrip",
+        "value": "{{3.content[].text}}"
+      },
+      "metadata": {
+        "designer": { "x": 900, "y": 0 }
+      }
+    },
+    {
+      "id": 5,
+      "module": "gateway:WebhookRespond",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "status": "200",
+        "body": "{\"response\": \"{{4.ai_response_text}}\", \"thread_id\": \"{{1.thread_id}}\"}",
+        "headers": [
+          { "name": "content-type", "value": "application/json" }
+        ]
+      },
+      "metadata": {
+        "designer": { "x": 1200, "y": 0 }
+      }
+    },
+    {
+      "id": 6,
+      "module": "regexp:Replace",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "pattern": "APPOINTMENT_DATA:\\s*\\{([\\s\\S]*?)\\}",
+        "global": false,
+        "sensitive": false,
+        "multiline": false,
+        "text": "{{4.ai_response_text}}",
+        "replacement": "$0"
+      },
+      "metadata": {
+        "designer": { "x": 1500, "y": 0 },
+        "notes": "Extracts APPOINTMENT_DATA JSON block from AI response"
+      }
+    },
+    {
+      "id": 7,
+      "module": "router:RouterModule",
+      "version": 1,
+      "parameters": {},
+      "metadata": {
+        "designer": { "x": 1800, "y": 0 }
+      },
+      "routes": [
+        {
+          "label": "Has Appointment Data",
+          "condition": "{{contains(4.ai_response_text, \"APPOINTMENT_DATA\")}}",
+          "flow": [
+            {
+              "id": 8,
+              "module": "regexp:Replace",
+              "version": 1,
+              "parameters": {},
+              "mapper": {
+                "pattern": "APPOINTMENT_DATA:\\s*(\\{[\\s\\S]*?\\})",
+                "global": false,
+                "sensitive": false,
+                "multiline": true,
+                "text": "{{4.ai_response_text}}",
+                "replacement": "$1"
+              },
+              "metadata": {
+                "designer": { "x": 2100, "y": -200 },
+                "notes": "Isolate the JSON object from APPOINTMENT_DATA block"
+              }
+            },
+            {
+              "id": 9,
+              "module": "http:ActionSendData",
+              "version": 3,
+              "parameters": { "handleErrors": true },
+              "mapper": {
+                "url": "{{APPOINTMENT_WEBHOOK_URL}}",
+                "method": "post",
+                "headers": [
+                  { "name": "content-type", "value": "application/json" }
+                ],
+                "bodyType": "raw",
+                "contentType": "application/json",
+                "body": "{{8.result}}"
+              },
+              "metadata": {
+                "designer": { "x": 2400, "y": -200 },
+                "notes": "Forward to vc-appointment-booking scenario webhook"
+              }
+            }
+          ]
+        },
+        {
+          "label": "Has Escalation Data",
+          "condition": "{{contains(4.ai_response_text, \"ESCALATION_DATA\")}}",
+          "flow": [
+            {
+              "id": 10,
+              "module": "regexp:Replace",
+              "version": 1,
+              "parameters": {},
+              "mapper": {
+                "pattern": "ESCALATION_DATA:\\s*(\\{[\\s\\S]*?\\})",
+                "global": false,
+                "sensitive": false,
+                "multiline": true,
+                "text": "{{4.ai_response_text}}",
+                "replacement": "$1"
+              },
+              "metadata": {
+                "designer": { "x": 2100, "y": 200 },
+                "notes": "Isolate the JSON object from ESCALATION_DATA block"
+              }
+            },
+            {
+              "id": 11,
+              "module": "http:ActionSendData",
+              "version": 3,
+              "parameters": { "handleErrors": true },
+              "mapper": {
+                "url": "{{ESCALATION_WEBHOOK_URL}}",
+                "method": "post",
+                "headers": [
+                  { "name": "content-type", "value": "application/json" }
+                ],
+                "bodyType": "raw",
+                "contentType": "application/json",
+                "body": "{{10.result}}"
+              },
+              "metadata": {
+                "designer": { "x": 2400, "y": 200 },
+                "notes": "Forward to vc-escalation-notifier scenario webhook"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "us1.make.com"
+  },
+  "_setup_variables": {
+    "ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY",
+    "SKILL_SYSTEM_PROMPT": "Paste the contents of SKILL.md here (escape quotes)",
+    "WEBHOOK_ID": "Replace with Make webhook ID after creating the webhook",
+    "APPOINTMENT_WEBHOOK_URL": "Paste the webhook URL from vc-appointment-booking scenario",
+    "ESCALATION_WEBHOOK_URL": "Paste the webhook URL from vc-escalation-notifier scenario"
+  }
+}

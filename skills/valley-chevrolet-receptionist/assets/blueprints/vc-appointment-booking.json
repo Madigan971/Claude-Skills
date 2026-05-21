@@ -1,0 +1,143 @@
+{
+  "name": "VC Book Appointment",
+  "description": "Receives APPOINTMENT_DATA JSON from the inbound router, creates a Google Calendar event in the service department calendar, emails a confirmation to the customer, and sends an internal notification to the service desk.",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "hook": "{{APPOINTMENT_WEBHOOK_ID}}"
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": { "x": 0, "y": 0 },
+        "restore": {
+          "parameters": {
+            "hook": { "label": "VC Appointment Booking Webhook" }
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "json:ParseJSON",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "json": "{{1.body}}",
+        "type": "auto"
+      },
+      "metadata": {
+        "designer": { "x": 300, "y": 0 }
+      }
+    },
+    {
+      "id": 3,
+      "module": "tools:SetMultipleVariables",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "variables": [
+          {
+            "name": "event_start",
+            "value": "{{formatDate(2.preferred_date, \"YYYY-MM-DD\")}}T{{if(2.preferred_time == \"morning\", \"08:00:00\", if(2.preferred_time == \"afternoon\", \"13:00:00\", \"09:00:00\"))}}"
+          },
+          {
+            "name": "event_end",
+            "value": "{{formatDate(2.preferred_date, \"YYYY-MM-DD\")}}T{{if(2.preferred_time == \"morning\", \"09:30:00\", if(2.preferred_time == \"afternoon\", \"14:30:00\", \"10:30:00\"))}}"
+          },
+          {
+            "name": "event_title",
+            "value": "{{2.service_requested}} — {{2.customer_name}} — {{2.vehicle}}"
+          }
+        ]
+      },
+      "metadata": {
+        "designer": { "x": 600, "y": 0 }
+      }
+    },
+    {
+      "id": 4,
+      "module": "google-calendar:createEvent",
+      "version": 4,
+      "parameters": {
+        "calendarId": "{{SERVICE_CALENDAR_ID}}"
+      },
+      "mapper": {
+        "summary": "{{3.event_title}}",
+        "description": "Customer: {{2.customer_name}}\nPhone: {{2.phone}}\nEmail: {{2.email}}\nVehicle: {{2.vehicle}} ({{2.mileage}} miles)\nService: {{2.service_requested}}\nDrop-off: {{2.drop_off}}\nLoaner needed: {{2.loaner_needed}}\nNotes: {{2.notes}}\n\nBooked via AI Receptionist",
+        "location": "700 Kidder Street, Wilkes-Barre, PA 18702",
+        "startDate": "{{3.event_start}}",
+        "endDate": "{{3.event_end}}",
+        "timeZone": "America/New_York",
+        "sendNotifications": true
+      },
+      "metadata": {
+        "designer": { "x": 900, "y": 0 }
+      }
+    },
+    {
+      "id": 5,
+      "module": "gmail:ActionSendEmail",
+      "version": 1,
+      "parameters": {
+        "account": "{{GMAIL_CONNECTION_ID}}"
+      },
+      "mapper": {
+        "to": "{{2.email}}",
+        "from": "{{FROM_EMAIL}}",
+        "subject": "Your Service Appointment at Valley Chevrolet — {{formatDate(2.preferred_date, \"MMM D, YYYY\")}}",
+        "content": "<p>Hi {{2.customer_name}},</p><p>Your service appointment has been confirmed!</p><table style=\"border-collapse:collapse;font-family:Arial,sans-serif;\"><tr><td style=\"padding:4px 12px 4px 0;\"><strong>Date:</strong></td><td>{{formatDate(2.preferred_date, \"dddd, MMMM D, YYYY\")}}</td></tr><tr><td style=\"padding:4px 12px 4px 0;\"><strong>Time:</strong></td><td>{{if(2.preferred_time == \"morning\", \"8:00 AM\", if(2.preferred_time == \"afternoon\", \"1:00 PM\", 2.preferred_time))}}</td></tr><tr><td style=\"padding:4px 12px 4px 0;\"><strong>Vehicle:</strong></td><td>{{2.vehicle}}</td></tr><tr><td style=\"padding:4px 12px 4px 0;\"><strong>Service:</strong></td><td>{{2.service_requested}}</td></tr><tr><td style=\"padding:4px 12px 4px 0;\"><strong>Location:</strong></td><td>700 Kidder Street, Wilkes-Barre, PA 18702</td></tr></table><p>{{if(2.loaner_needed == true, \"A loaner vehicle has been noted on your reservation — subject to availability.\", \"\")}}</p><p>If you need to reschedule or have any questions, please call us at (570) 823-XXXX.</p><p>We look forward to seeing you and your {{2.vehicle}}!</p><p><strong>Valley Chevrolet Service Center</strong><br>700 Kidder Street, Wilkes-Barre, PA 18702</p>",
+        "type": "html"
+      },
+      "metadata": {
+        "designer": { "x": 1200, "y": -200 }
+      }
+    },
+    {
+      "id": 6,
+      "module": "gmail:ActionSendEmail",
+      "version": 1,
+      "parameters": {
+        "account": "{{GMAIL_CONNECTION_ID}}"
+      },
+      "mapper": {
+        "to": "{{SERVICE_DESK_EMAIL}}",
+        "from": "{{FROM_EMAIL}}",
+        "subject": "[NEW APPT] {{2.customer_name}} — {{2.vehicle}} — {{formatDate(2.preferred_date, \"MMM D\")}}",
+        "content": "<h3>New Appointment Booked via AI Receptionist</h3><table style=\"border-collapse:collapse;font-family:Arial,sans-serif;\"><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Customer:</strong></td><td>{{2.customer_name}}</td></tr><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Phone:</strong></td><td>{{2.phone}}</td></tr><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Email:</strong></td><td>{{2.email}}</td></tr><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Vehicle:</strong></td><td>{{2.vehicle}} — {{2.mileage}} miles</td></tr><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Service:</strong></td><td>{{2.service_requested}}</td></tr><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Date/Time:</strong></td><td>{{formatDate(2.preferred_date, \"dddd, MMMM D, YYYY\")}} — {{2.preferred_time}}</td></tr><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Drop-off:</strong></td><td>{{2.drop_off}}</td></tr><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Loaner needed:</strong></td><td>{{2.loaner_needed}}</td></tr><tr><td style=\"padding:4px 16px 4px 0;\"><strong>Notes:</strong></td><td>{{2.notes}}</td></tr></table>",
+        "type": "html"
+      },
+      "metadata": {
+        "designer": { "x": 1200, "y": 200 }
+      }
+    }
+  ],
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "us1.make.com"
+  },
+  "_setup_variables": {
+    "APPOINTMENT_WEBHOOK_ID": "Replace with Make webhook ID after creating the webhook",
+    "SERVICE_CALENDAR_ID": "Your Google Calendar ID for the service department (e.g. abc123@group.calendar.google.com)",
+    "GMAIL_CONNECTION_ID": "Your Gmail connection ID in Make",
+    "FROM_EMAIL": "service@valleychevrolet.com",
+    "SERVICE_DESK_EMAIL": "servicedesk@valleychevrolet.com"
+  }
+}
