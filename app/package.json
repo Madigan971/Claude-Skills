@@ -1,0 +1,14 @@
+{
+  "name": "ai-lead-qualification",
+  "version": "1.0.0",
+  "description": "AI-powered lead qualification app for home services businesses",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY} node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

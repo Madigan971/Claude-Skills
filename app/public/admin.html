@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Dashboard – ProHome Services</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #1e40af;
+      --blue-light: #3b82f6;
+      --blue-bg: #eff6ff;
+      --orange: #ea580c;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --green: #16a34a;
+      --green-light: #86efac;
+      --green-bg: #f0fdf4;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --yellow: #d97706;
+      --yellow-bg: #fffbeb;
+      --purple: #7c3aed;
+      --purple-bg: #f5f3ff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      min-height: 100vh;
+      color: var(--gray-800);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: var(--gray-800);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+    .sidebar-logo {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-nav { padding: 16px 12px; flex: 1; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 2px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav-item.active { background: var(--blue); color: white; }
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .view-site-btn {
+      display: block;
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.8);
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .view-site-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* Main */
+    .main { margin-left: 240px; min-height: 100vh; }
+
+    /* Top bar */
+    .topbar {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 28px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 9;
+    }
+    .topbar h1 { font-size: 18px; font-weight: 700; }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-primary:hover { background: var(--blue-light); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--gray-600);
+      border: 1.5px solid var(--gray-200);
+    }
+    .btn-ghost:hover { background: var(--gray-100); }
+    .btn-danger { background: var(--red-bg); color: var(--red); }
+    .btn-danger:hover { background: var(--red); color: white; }
+
+    /* Content */
+    .content { padding: 28px; }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--gray-200);
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      margin-bottom: 8px;
+    }
+    .stat-value { font-size: 32px; font-weight: 700; color: var(--gray-800); }
+    .stat-sub { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+    .stat-icon { font-size: 28px; float: right; margin-top: -4px; }
+
+    /* Filters */
+    .filters {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--gray-200);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1.5px solid var(--gray-200);
+      background: white;
+      color: var(--gray-600);
+      transition: all 0.1s;
+    }
+    .filter-btn.active, .filter-btn:hover { border-color: var(--blue-light); background: var(--blue-bg); color: var(--blue); }
+    .filter-sep { color: var(--gray-300); }
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+    .search-input:focus { border-color: var(--blue-light); }
+
+    /* Lead table / cards */
+    .leads-container { display: flex; flex-direction: column; gap: 12px; }
+
+    .lead-card {
+      background: white;
+      border-radius: 12px;
+      border: 1.5px solid var(--gray-200);
+      overflow: hidden;
+      transition: box-shadow 0.15s;
+    }
+    .lead-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .lead-card.selected { border-color: var(--blue-light); }
+
+    .lead-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .score-ring {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .score-hot { background: #fef2f2; color: var(--red); border: 2px solid #fca5a5; }
+    .score-warm { background: var(--yellow-bg); color: var(--yellow); border: 2px solid #fcd34d; }
+    .score-cold { background: var(--blue-bg); color: var(--blue); border: 2px solid #93c5fd; }
+
+    .lead-info { flex: 1; min-width: 0; }
+    .lead-name { font-size: 15px; font-weight: 600; color: var(--gray-800); }
+    .lead-meta { font-size: 12.5px; color: var(--gray-500); margin-top: 2px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .tier-badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .tier-hot { background: #fef2f2; color: var(--red); }
+    .tier-warm { background: var(--yellow-bg); color: var(--yellow); }
+    .tier-cold { background: var(--blue-bg); color: var(--blue); }
+
+    .lead-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .lead-value { font-size: 13px; font-weight: 600; color: var(--green); }
+    .lead-time { font-size: 11px; color: var(--gray-400); }
+    .priority-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+    }
+    .priority-immediate { background: var(--red); }
+    .priority-today { background: var(--yellow); }
+    .priority-this-week { background: var(--green); }
+
+    .lead-details {
+      border-top: 1px solid var(--gray-100);
+      padding: 16px 20px;
+      display: none;
+      background: var(--gray-50);
+    }
+    .lead-details.open { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .detail-section h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.05em; margin-bottom: 10px; }
+    .detail-row { display: flex; gap: 8px; font-size: 13px; margin-bottom: 6px; }
+    .detail-key { color: var(--gray-500); min-width: 110px; flex-shrink: 0; }
+    .detail-val { color: var(--gray-800); font-weight: 500; }
+
+    .reasoning-box {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--gray-600);
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    .lead-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .status-select {
+      font-size: 12px;
+      padding: 4px 8px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 6px;
+      background: white;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+    }
+    .status-select:focus { border-color: var(--blue-light); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray-400);
+    }
+    .empty-state .icon { font-size: 52px; margin-bottom: 14px; }
+    .empty-state h3 { font-size: 18px; color: var(--gray-600); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+
+    /* Loading */
+    .loading-spinner {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray-400);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--gray-800);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.2s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .lead-details.open { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">🏠 ProHome CRM</div>
+  <nav class="sidebar-nav">
+    <a class="nav-item active" href="#">📋 All Leads</a>
+    <a class="nav-item" href="#" onclick="filterByTier('hot')">🔥 Hot Leads</a>
+    <a class="nav-item" href="#" onclick="filterByTier('warm')">☀️ Warm Leads</a>
+    <a class="nav-item" href="#" onclick="filterByTier('cold')">❄️ Cold Leads</a>
+    <a class="nav-item" href="#" onclick="filterByStatus('new')">🆕 New</a>
+    <a class="nav-item" href="#" onclick="filterByStatus('contacted')">📞 Contacted</a>
+    <a class="nav-item" href="#" onclick="filterByStatus('scheduled')">📅 Scheduled</a>
+    <a class="nav-item" href="#" onclick="filterByStatus('won')">✅ Won</a>
+    <a class="nav-item" href="#" onclick="filterByStatus('lost')">❌ Lost</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="/" class="view-site-btn" target="_blank">↗ View Lead Form</a>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <h1 id="pageTitle">All Leads</h1>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="loadLeads()">↻ Refresh</button>
+      <button class="btn btn-primary" onclick="exportCSV()">↓ Export CSV</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Total Leads</div>
+        <div class="stat-value" id="statTotal">–</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-label">Hot Leads</div>
+        <div class="stat-value" id="statHot">–</div>
+        <div class="stat-sub">Score ≥ 70</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-label">Need Immediate</div>
+        <div class="stat-value" id="statImmediate">–</div>
+        <div class="stat-sub">Follow up now</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">Today's Leads</div>
+        <div class="stat-value" id="statToday">–</div>
+        <div class="stat-sub">Last 24 hours</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('tier:hot', this)">🔥 Hot</button>
+      <button class="filter-btn" onclick="setFilter('tier:warm', this)">☀️ Warm</button>
+      <button class="filter-btn" onclick="setFilter('tier:cold', this)">❄️ Cold</button>
+      <span class="filter-sep">|</span>
+      <button class="filter-btn" onclick="setFilter('status:new', this)">New</button>
+      <button class="filter-btn" onclick="setFilter('status:contacted', this)">Contacted</button>
+      <button class="filter-btn" onclick="setFilter('status:scheduled', this)">Scheduled</button>
+      <button class="filter-btn" onclick="setFilter('status:won', this)">Won</button>
+      <input class="search-input" id="searchInput" placeholder="🔍  Search by name, service, zip..." oninput="renderLeads()">
+    </div>
+
+    <div id="leadsContainer" class="leads-container">
+      <div class="loading-spinner">Loading leads...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let allLeads = [];
+  let activeFilter = 'all';
+  let openLeadId = null;
+
+  async function loadLeads() {
+    try {
+      const res = await fetch('/api/leads');
+      allLeads = await res.json();
+      updateStats();
+      renderLeads();
+    } catch (err) {
+      document.getElementById('leadsContainer').innerHTML =
+        '<div class="empty-state"><div class="icon">⚠️</div><h3>Failed to load leads</h3><p>Make sure the server is running.</p></div>';
+    }
+  }
+
+  function updateStats() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    document.getElementById('statTotal').textContent = allLeads.length;
+    document.getElementById('statHot').textContent = allLeads.filter(l => l.tier === 'hot').length;
+    document.getElementById('statImmediate').textContent = allLeads.filter(l => l.followUpPriority === 'immediate').length;
+    document.getElementById('statToday').textContent = allLeads.filter(l => new Date(l.createdAt) >= today).length;
+  }
+
+  function setFilter(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderLeads();
+  }
+
+  function filterByTier(tier) { setFilter('tier:' + tier, null); }
+  function filterByStatus(status) { setFilter('status:' + status, null); }
+
+  function getFilteredLeads() {
+    const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    return allLeads.filter(l => {
+      if (activeFilter !== 'all') {
+        const [key, val] = activeFilter.split(':');
+        if (l[key] !== val) return false;
+      }
+      if (search) {
+        const haystack = [l.name, l.serviceType, l.zipCode, l.issueDescription, l.contact].join(' ').toLowerCase();
+        if (!haystack.includes(search)) return false;
+      }
+      return true;
+    });
+  }
+
+  function formatTime(iso) {
+    if (!iso) return '–';
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    return d.toLocaleDateString();
+  }
+
+  function formatService(s) {
+    const map = {
+      'hvac-repair': 'HVAC Repair', 'hvac-install': 'HVAC Install',
+      'heating': 'Heating', 'cooling': 'Cooling / AC',
+      'plumbing': 'Plumbing', 'electrical': 'Electrical',
+      'maintenance': 'Maintenance', 'other': 'Other',
+    };
+    return map[s] || s || '–';
+  }
+
+  function formatUrgency(u) {
+    const map = { emergency: '🚨 Emergency', urgent: '⚡ Urgent', scheduled: '📅 Scheduled', planning: '🗓 Planning' };
+    return map[u] || u || '–';
+  }
+
+  function renderLeads() {
+    const leads = getFilteredLeads();
+    const container = document.getElementById('leadsContainer');
+
+    if (!leads.length) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>No leads found</h3><p>Try adjusting your filters or wait for new submissions.</p></div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    leads.forEach(lead => {
+      const scoreClass = lead.tier === 'hot' ? 'score-hot' : lead.tier === 'warm' ? 'score-warm' : 'score-cold';
+      const tierClass = 'tier-' + (lead.tier || 'cold');
+      const priorityClass = 'priority-' + (lead.followUpPriority || 'today').replace('-', '');
+      const isOpen = openLeadId === lead.id;
+
+      const card = document.createElement('div');
+      card.className = 'lead-card' + (isOpen ? ' selected' : '');
+      card.id = 'card-' + lead.id;
+
+      card.innerHTML = `
+        <div class="lead-header" onclick="toggleLead('${lead.id}')">
+          <div class="score-ring ${scoreClass}">${lead.score || '?'}</div>
+          <div class="lead-info">
+            <div class="lead-name">${esc(lead.name || 'Unknown')}</div>
+            <div class="lead-meta">
+              <span>${formatService(lead.serviceType)}</span>
+              <span>${formatUrgency(lead.urgency)}</span>
+              ${lead.zipCode ? `<span>📍 ${esc(lead.zipCode)}</span>` : ''}
+            </div>
+          </div>
+          <div class="lead-right">
+            <div>
+              <span class="tier-badge ${tierClass}">${(lead.tier || 'cold').toUpperCase()}</span>
+            </div>
+            <div class="lead-value">${esc(lead.estimatedValue || '–')}</div>
+            <div class="lead-time">
+              <span class="priority-dot ${priorityClass}"></span>
+              ${formatTime(lead.createdAt)}
+            </div>
+          </div>
+        </div>
+        <div class="lead-details ${isOpen ? 'open' : ''}" id="details-${lead.id}">
+          <div class="detail-section">
+            <h4>Contact Info</h4>
+            <div class="detail-row"><span class="detail-key">Name</span><span class="detail-val">${esc(lead.name || '–')}</span></div>
+            <div class="detail-row"><span class="detail-key">Contact</span><span class="detail-val">${esc(lead.contact || '–')}</span></div>
+            <div class="detail-row"><span class="detail-key">ZIP Code</span><span class="detail-val">${esc(lead.zipCode || '–')}</span></div>
+            <div class="detail-row"><span class="detail-key">Property</span><span class="detail-val">${esc(lead.propertyType || '–')}</span></div>
+
+            <h4 style="margin-top: 16px;">Issue Details</h4>
+            <div class="detail-row"><span class="detail-key">Service</span><span class="detail-val">${formatService(lead.serviceType)}</span></div>
+            <div class="detail-row"><span class="detail-key">Urgency</span><span class="detail-val">${formatUrgency(lead.urgency)}</span></div>
+            <div class="detail-row"><span class="detail-key">Description</span><span class="detail-val">${esc(lead.issueDescription || '–')}</span></div>
+          </div>
+          <div class="detail-section">
+            <h4>AI Qualification</h4>
+            <div class="detail-row"><span class="detail-key">Score</span><span class="detail-val">${lead.score || '–'}/100</span></div>
+            <div class="detail-row"><span class="detail-key">Tier</span><span class="detail-val">${(lead.tier || '–').toUpperCase()}</span></div>
+            <div class="detail-row"><span class="detail-key">Est. Value</span><span class="detail-val">${esc(lead.estimatedValue || '–')}</span></div>
+            <div class="detail-row"><span class="detail-key">Follow Up</span><span class="detail-val">${esc(lead.followUpPriority || '–')}</span></div>
+            <div class="detail-row"><span class="detail-key">Conv. Turns</span><span class="detail-val">${lead.conversationLength || '–'} messages</span></div>
+            <div class="detail-row"><span class="detail-key">Lead ID</span><span class="detail-val" style="font-family: monospace; font-size: 11px;">${lead.id}</span></div>
+            ${lead.reasoning ? `<div class="reasoning-box">${esc(lead.reasoning)}</div>` : ''}
+
+            <h4 style="margin-top: 16px;">Status</h4>
+            <div class="lead-actions">
+              <select class="status-select" onchange="updateStatus('${lead.id}', this.value)">
+                <option value="new" ${lead.status === 'new' ? 'selected' : ''}>🆕 New</option>
+                <option value="contacted" ${lead.status === 'contacted' ? 'selected' : ''}>📞 Contacted</option>
+                <option value="scheduled" ${lead.status === 'scheduled' ? 'selected' : ''}>📅 Scheduled</option>
+                <option value="won" ${lead.status === 'won' ? 'selected' : ''}>✅ Won</option>
+                <option value="lost" ${lead.status === 'lost' ? 'selected' : ''}>❌ Lost</option>
+              </select>
+              <button class="btn btn-danger" onclick="deleteLead('${lead.id}')">🗑 Delete</button>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function toggleLead(id) {
+    openLeadId = openLeadId === id ? null : id;
+    renderLeads();
+  }
+
+  async function updateStatus(id, status) {
+    try {
+      await fetch('/api/leads', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status }),
+      });
+      const lead = allLeads.find(l => l.id === id);
+      if (lead) lead.status = status;
+      showToast('Status updated to ' + status);
+    } catch {
+      showToast('Failed to update status');
+    }
+  }
+
+  async function deleteLead(id) {
+    if (!confirm('Delete this lead? This cannot be undone.')) return;
+    try {
+      await fetch('/api/leads', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      allLeads = allLeads.filter(l => l.id !== id);
+      if (openLeadId === id) openLeadId = null;
+      updateStats();
+      renderLeads();
+      showToast('Lead deleted');
+    } catch {
+      showToast('Failed to delete lead');
+    }
+  }
+
+  function exportCSV() {
+    const leads = getFilteredLeads();
+    if (!leads.length) return showToast('No leads to export');
+
+    const headers = ['ID','Name','Contact','Service','Urgency','Property','ZIP','Description','Score','Tier','EstValue','FollowUp','Status','CreatedAt'];
+    const rows = leads.map(l => [
+      l.id, l.name, l.contact, l.serviceType, l.urgency, l.propertyType,
+      l.zipCode, l.issueDescription, l.score, l.tier, l.estimatedValue,
+      l.followUpPriority, l.status, l.createdAt
+    ].map(v => `"${String(v || '').replace(/"/g, '""')}"`));
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `leads-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    showToast('Exported ' + leads.length + ' leads');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  loadLeads();
+  // Auto-refresh every 30 seconds
+  setInterval(loadLeads, 30000);
+</script>
+</body>
+</html>
