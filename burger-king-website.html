@@ -1438,16 +1438,23 @@ ul{list-style:none}
         </div>
       </div>
       <div class="map-area">
-        <div class="map-bg"></div>
-        <div class="map-pins">
-          <div class="map-pin" style="left:44%;top:38%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
-          <div class="map-pin" style="left:55%;top:28%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
-          <div class="map-pin" style="left:62%;top:58%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
-          <div class="map-pin" style="left:30%;top:52%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
-          <div class="map-pin" style="left:70%;top:42%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+        <div id="bk-map" style="width:100%;height:100%;min-height:440px"></div>
+        <div class="map-placeholder" id="mapPlaceholder">
+          <div class="map-bg"></div>
+          <div class="map-pins">
+            <div class="map-pin" style="left:44%;top:38%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+            <div class="map-pin" style="left:55%;top:28%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+            <div class="map-pin" style="left:62%;top:58%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+            <div class="map-pin" style="left:30%;top:52%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+            <div class="map-pin" style="left:70%;top:42%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+          </div>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:monospace;font-size:10px;letter-spacing:2px;color:rgba(245,240,232,0.3);text-align:center;gap:8px">
+            <span style="font-size:32px">🗺</span>
+            ADD GOOGLE MAPS API KEY<br>TO BKCONFIG TO ENABLE MAP
+          </div>
         </div>
         <button class="map-find-btn" onclick="useMyLocation()">📍 Use My Location</button>
-        <div class="map-credit">Map data © BurgerKing 2026</div>
+        <div class="map-credit">Powered by Google Maps</div>
       </div>
     </div>
   </div>
@@ -1688,6 +1695,56 @@ ul{list-style:none}
   </div>
 </footer>
 
+<!-- CART OVERLAY & PANEL -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>🛒 Your Order</h3>
+    <button class="cart-close" onclick="closeCart()">×</button>
+  </div>
+  <div class="cart-items-list" id="cartItemsList">
+    <div class="cart-empty">
+      <span class="cart-empty-icon">🍔</span>
+      <span>Your cart is empty</span>
+      <span style="color:rgba(245,240,232,0.2)">Add items from the menu</span>
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-subtotal"><span>Items</span><span id="cartItemCount">0</span></div>
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-val" id="cartTotalVal">$0.00</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="checkout()">Checkout with Stripe →</button>
+    <div class="cart-stripe-note">🔒 Secured by Stripe · SSL encrypted</div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-modal" id="authModal">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuthModal()">×</button>
+    <div class="auth-logo">🔥 Burger King®</div>
+    <div class="auth-tabs">
+      <button class="auth-tab-btn active" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab-btn" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+    <div id="authSignin">
+      <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" type="email" id="siEmail" placeholder="you@example.com" /></div>
+      <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" type="password" id="siPassword" placeholder="••••••••" /></div>
+      <button class="auth-submit" onclick="signIn()">Sign In →</button>
+      <div class="auth-error" id="siError"></div>
+    </div>
+    <div id="authSignup" style="display:none">
+      <div class="auth-field"><label class="auth-label">Full Name</label><input class="auth-input" type="text" id="suName" placeholder="Your name" /></div>
+      <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" type="email" id="suEmail" placeholder="you@example.com" /></div>
+      <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" type="password" id="suPassword" placeholder="Min. 6 characters" /></div>
+      <button class="auth-submit" onclick="signUp()">Create Account →</button>
+      <div class="auth-error" id="suError"></div>
+    </div>
+  </div>
+</div>
+
 <!-- CART TOAST -->
 <div class="cart-toast" id="cartToast">
   <span class="toast-icon">🛒</span>
@@ -1698,128 +1755,461 @@ ul{list-style:none}
 </div>
 
 <script>
-/* ─── DATA ─── */
-const menuItems = [
-  // Burgers
-  {tab:'burgers',name:'Whopper®',desc:'A quarter-pound flame-grilled beef patty, fresh tomato, crisp lettuce.',price:'$5.99',cal:'657 cal',emoji:'🍔',flag:'bestseller',pair:'Add large fries?',tags:['all']},
-  {tab:'burgers',name:'Double Whopper®',desc:'Two flame-grilled patties, double the greatness.',price:'$7.49',cal:'902 cal',emoji:'🍔',flag:'fan',pair:'Try a milkshake?',tags:['all']},
-  {tab:'burgers',name:'Steakhouse Stack',desc:'Aged cheddar, crispy onions, smoky BK sauce. The new king.',price:'$8.99',cal:'820 cal',emoji:'🥩',flag:'',pair:'Add onion rings?',tags:['all']},
-  {tab:'burgers',name:'Impossible™ Whopper',desc:'100% plant-based patty, flame-grilled to perfection.',price:'$6.99',cal:'630 cal',emoji:'🌱',flag:'',pair:'Try plant-based nuggets?',tags:['all','veggie']},
-  {tab:'burgers',name:'Bacon Cheeseburger',desc:'Crispy bacon, melted American cheese, pickles, ketchup.',price:'$4.99',cal:'540 cal',emoji:'🥓',flag:'',pair:'Add large fries?',tags:['all']},
-  {tab:'burgers',name:'BK Veggie Burger',desc:'Garden-fresh vegetable patty with all the trimmings.',price:'$5.49',cal:'390 cal',emoji:'🥬',flag:'',pair:'Add a side salad?',tags:['all','veggie','lowcal']},
-  // Chicken
-  {tab:'chicken',name:'Crispy Chicken Sandwich',desc:'Hand-breaded crispy chicken breast on a brioche bun.',price:'$6.49',cal:'660 cal',emoji:'🍗',flag:'bestseller',pair:'Add coleslaw?',tags:['all']},
-  {tab:'chicken',name:'Fiery Chicken Sandwich',desc:'Double-breaded with ghost pepper coating. Not for the faint-hearted.',price:'$7.49',cal:'740 cal',emoji:'🌶️',flag:'fan',pair:'Cool down with a milkshake?',tags:['all','spicy']},
-  {tab:'chicken',name:'Grilled Chicken Wrap',desc:'Flame-grilled chicken, mixed leaves, BK chipotle sauce.',price:'$6.99',cal:'430 cal',emoji:'🌯',flag:'',pair:'Try a side salad?',tags:['all','lowcal']},
-  {tab:'chicken',name:'Chicken Nuggets (9pc)',desc:'Crispy on the outside, tender inside. Pick your dipping sauce.',price:'$5.49',cal:'480 cal',emoji:'🍖',flag:'',pair:'Add BBQ sauce?',tags:['all']},
-  {tab:'chicken',name:'Spicy Tendercrisp',desc:'Whole-muscle chicken breast with BK fiery seasoning.',price:'$8.49',cal:'700 cal',emoji:'🔥',flag:'',pair:'Add jalapenos?',tags:['all','spicy']},
-  // Sides
-  {tab:'sides',name:'Large Fries',desc:'Golden, crispy, lightly salted. Classic never fails.',price:'$3.49',cal:'430 cal',emoji:'🍟',flag:'bestseller',pair:'Add BK sauce?',tags:['all','veggie']},
-  {tab:'sides',name:'Onion Rings',desc:'Beer-battered rings of Vidalia onion. The original side.',price:'$3.99',cal:'410 cal',emoji:'🧅',flag:'fan',pair:'Try our chipotle dip?',tags:['all','veggie']},
-  {tab:'sides',name:'Side Salad',desc:'Mixed greens, cherry tomatoes, cucumber. Light and fresh.',price:'$2.99',cal:'80 cal',emoji:'🥗',flag:'',pair:'Add grilled chicken?',tags:['all','veggie','lowcal']},
-  {tab:'sides',name:'Mac & Cheetos',desc:'Creamy mac in a crispy Cheetos shell. Dangerously addictive.',price:'$3.29',cal:'290 cal',emoji:'🧀',flag:'',pair:'Add a drink?',tags:['all','veggie']},
-  // Drinks
-  {tab:'drinks',name:'Large Coca-Cola',desc:'Ice cold. The perfect flame-grilled companion.',price:'$2.49',cal:'290 cal',emoji:'🥤',flag:'bestseller',pair:'Add a straw?',tags:['all','veggie']},
-  {tab:'drinks',name:'Chocolate Milkshake',desc:'Thick, creamy, hand-spun. Better than the competition.',price:'$3.99',cal:'580 cal',emoji:'🥛',flag:'fan',pair:'Add whipped cream?',tags:['all','veggie']},
-  {tab:'drinks',name:'Fresh Orange Juice',desc:'100% squeezed. No added sugar. Actually orange.',price:'$3.29',cal:'190 cal',emoji:'🍊',flag:'',pair:'',tags:['all','veggie','lowcal']},
-  {tab:'drinks',name:'BK Iced Coffee',desc:'Cold-brew with your choice of milk. Caffeine meets fire.',price:'$3.49',cal:'110 cal',emoji:'☕',flag:'',pair:'Add an extra shot?',tags:['all','veggie','lowcal']},
-  // Desserts
-  {tab:'desserts',name:'OREO® Cheesecake',desc:'Creamy cheesecake on a crumbled OREO base. That simple.',price:'$3.49',cal:'390 cal',emoji:'🍰',flag:'bestseller',pair:'Add a milkshake?',tags:['all','veggie']},
-  {tab:'desserts',name:'Soft Serve Cone',desc:'Classic vanilla soft serve. Simple. Perfect.',price:'$1.49',cal:'170 cal',emoji:'🍦',flag:'',pair:'',tags:['all','veggie','lowcal']},
-  {tab:'desserts',name:'Chocolate Brownie',desc:'Warm, fudgy, with a hint of sea salt. Ends meals right.',price:'$2.99',cal:'450 cal',emoji:'🍫',flag:'fan',pair:'Add ice cream?',tags:['all','veggie']},
+/* ─── CONFIGURATION — fill in your keys ─── */
+const BKCONFIG = {
+  googleMapsKey:      'YOUR_GOOGLE_MAPS_API_KEY',
+  supabaseUrl:        'YOUR_SUPABASE_URL',
+  supabaseAnonKey:    'YOUR_SUPABASE_ANON_KEY',
+  stripePublishable:  'YOUR_STRIPE_PUBLISHABLE_KEY',
+  appUrl:             window.location.origin,
+};
+
+/* ─── SUPABASE INIT ─── */
+let supabase = null;
+let currentUser = null;
+let userPoints = 0;
+if (
+  window.supabase &&
+  BKCONFIG.supabaseUrl !== 'YOUR_SUPABASE_URL' &&
+  BKCONFIG.supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY'
+) {
+  supabase = window.supabase.createClient(BKCONFIG.supabaseUrl, BKCONFIG.supabaseAnonKey);
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) setUser(session.user);
+  });
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session) setUser(session.user);
+    else clearUser();
+  });
+}
+
+async function setUser(user) {
+  currentUser = user;
+  document.getElementById('authBtn').style.display = 'none';
+  document.getElementById('userPill').style.display = 'flex';
+  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  document.getElementById('navUserName').textContent = name;
+  if (supabase) {
+    const { data } = await supabase.from('loyalty_balances').select('balance').eq('user_id', user.id).single();
+    userPoints = data?.balance || 0;
+    document.getElementById('navUserPts').textContent = userPoints.toLocaleString() + ' pts';
+    document.querySelector('.app-card-pts') && (document.querySelectorAll('.app-card-pts').forEach(el => el.textContent = '+' + (userPoints / 100 | 0) + ' pts'));
+  }
+}
+function clearUser() {
+  currentUser = null;
+  userPoints = 0;
+  document.getElementById('authBtn').style.display = '';
+  document.getElementById('userPill').style.display = 'none';
+}
+
+/* ─── AUTH MODAL ─── */
+function openAuthModal() { document.getElementById('authModal').classList.add('open'); }
+function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab-btn').forEach((b, i) => b.classList.toggle('active', (tab === 'signin' ? i === 0 : i === 1)));
+  document.getElementById('authSignin').style.display = tab === 'signin' ? '' : 'none';
+  document.getElementById('authSignup').style.display = tab === 'signup' ? '' : 'none';
+}
+document.getElementById('authModal').addEventListener('click', e => { if (e.target === document.getElementById('authModal')) closeAuthModal(); });
+
+async function signIn() {
+  if (!supabase) return alert('Supabase not configured — add your keys to BKCONFIG.');
+  const email = document.getElementById('siEmail').value.trim();
+  const password = document.getElementById('siPassword').value;
+  document.getElementById('siError').textContent = '';
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { document.getElementById('siError').textContent = error.message; return; }
+  closeAuthModal();
+}
+
+async function signUp() {
+  if (!supabase) return alert('Supabase not configured — add your keys to BKCONFIG.');
+  const name = document.getElementById('suName').value.trim();
+  const email = document.getElementById('suEmail').value.trim();
+  const password = document.getElementById('suPassword').value;
+  document.getElementById('suError').textContent = '';
+  if (password.length < 6) { document.getElementById('suError').textContent = 'Password must be at least 6 characters.'; return; }
+  const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+  if (error) { document.getElementById('suError').textContent = error.message; return; }
+  document.getElementById('suError').textContent = 'Check your email to confirm your account!';
+}
+
+async function signOut() {
+  if (!supabase) return;
+  await supabase.auth.signOut();
+  clearUser();
+}
+
+/* ─── CART STATE ─── */
+let cart = [];
+
+function openCart() {
+  document.getElementById('cartPanel').classList.add('open');
+  document.getElementById('cartOverlay').classList.add('show');
+  renderCartPanel();
+}
+function closeCart() {
+  document.getElementById('cartPanel').classList.remove('open');
+  document.getElementById('cartOverlay').classList.remove('show');
+}
+
+function addToCart(name, price, idx, emoji) {
+  const existing = cart.find(i => i.name === name);
+  if (existing) { existing.qty++; }
+  else { cart.push({ name, price, emoji: emoji || '🍔', qty: 1 }); }
+  updateCartBadge();
+  if (idx !== undefined) {
+    const btn = document.getElementById('qa' + idx);
+    if (btn) { btn.classList.add('added'); btn.textContent = '✓'; setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+'; }, 800); }
+  }
+  showMiniToast(name);
+  renderCartPanel();
+}
+
+function updateCartBadge() {
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  const count = document.getElementById('cartCount');
+  count.textContent = total;
+  count.classList.toggle('show', total > 0);
+}
+
+function cartTotal() {
+  return cart.reduce((s, i) => s + parseFloat(i.price.replace('$', '')) * i.qty, 0);
+}
+
+function renderCartPanel() {
+  const list = document.getElementById('cartItemsList');
+  const totalEl = document.getElementById('cartTotalVal');
+  const countEl = document.getElementById('cartItemCount');
+  totalEl.textContent = '$' + cartTotal().toFixed(2);
+  countEl.textContent = cart.reduce((s, i) => s + i.qty, 0);
+  if (cart.length === 0) {
+    list.innerHTML = '<div class="cart-empty"><span class="cart-empty-icon">🍔</span><span>Your cart is empty</span><span style="color:rgba(245,240,232,0.2)">Add items from the menu</span></div>';
+    document.getElementById('checkoutBtn').disabled = true;
+    return;
+  }
+  document.getElementById('checkoutBtn').disabled = false;
+  list.innerHTML = cart.map((item, i) => `
+    <div class="cart-item">
+      <span class="cart-item-emoji">${item.emoji}</span>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${item.price}</div>
+      </div>
+      <div class="cart-qty-controls">
+        <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+        <span class="qty-val">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function changeQty(idx, delta) {
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  updateCartBadge();
+  renderCartPanel();
+}
+
+let miniToastTimer;
+function showMiniToast(name) {
+  clearTimeout(miniToastTimer);
+  document.getElementById('toastItem').textContent = name;
+  document.getElementById('toastTotal').textContent = '$' + cartTotal().toFixed(2) + ' total';
+  const t = document.getElementById('cartToast');
+  t.classList.add('show');
+  miniToastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+async function checkout() {
+  if (!cart.length) return;
+  const btn = document.getElementById('checkoutBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting…';
+
+  if (BKCONFIG.stripePublishable === 'YOUR_STRIPE_PUBLISHABLE_KEY') {
+    alert('Stripe not configured yet.\n\nTo enable payments:\n1. Get your keys at stripe.com\n2. Update BKCONFIG in the HTML\n3. Deploy api/create-checkout.js to Vercel');
+    btn.disabled = false;
+    btn.textContent = 'Checkout with Stripe →';
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart, userId: currentUser?.id || null }),
+    });
+    const { url, error } = await res.json();
+    if (error) throw new Error(error);
+    window.location.href = url;
+  } catch (err) {
+    alert('Checkout failed: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Checkout with Stripe →';
+  }
+}
+
+/* ─── GOOGLE MAPS ─── */
+let map = null;
+const bkLocations = [
+  { name: 'BK Midtown — 5th Avenue', address: '452 5th Ave, New York', lat: 40.7506, lng: -73.9832, waitMin: 5, features: ['Drive-Thru','Delivery'] },
+  { name: 'BK Times Square',         address: '700 8th Ave, New York',  lat: 40.7590, lng: -73.9900, waitMin: 8, features: ['Delivery'] },
+  { name: 'BK Brooklyn Bridge',      address: '144 Fulton St, Brooklyn', lat: 40.6927, lng: -73.9911, waitMin: 3, features: ['Drive-Thru'] },
+  { name: 'BK Grand Central',        address: '89 E 42nd St, New York',  lat: 40.7529, lng: -73.9774, waitMin: 12, features: ['Dine-In','Delivery'] },
+  { name: 'BK Union Square',         address: '14 Union Sq W, New York', lat: 40.7361, lng: -73.9904, waitMin: 6, features: ['Drive-Thru','Dine-In'] },
 ];
 
+function initMap() {
+  if (BKCONFIG.googleMapsKey === 'YOUR_GOOGLE_MAPS_API_KEY') return; // key not set yet
+  const mapEl = document.getElementById('bk-map');
+  if (!mapEl || !window.google) return;
+
+  document.getElementById('bk-map').classList.add('loaded');
+  document.getElementById('mapPlaceholder').classList.add('hidden');
+
+  map = new google.maps.Map(mapEl, {
+    center: { lat: 40.7400, lng: -73.9850 },
+    zoom: 13,
+    styles: [
+      { elementType: 'geometry', stylers: [{ color: '#1a1a1a' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#a0a0a0' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1a1a' }] },
+      { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2d2d2d' }] },
+      { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#383838' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0d1117' }] },
+      { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+    ],
+  });
+
+  const pinSvg = {
+    path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z',
+    fillColor: '#D62300', fillOpacity: 1,
+    strokeColor: '#F5F0E8', strokeWeight: 1.5,
+    scale: 1.5, anchor: new google.maps.Point(12, 22),
+  };
+
+  bkLocations.forEach((loc, i) => {
+    const marker = new google.maps.Marker({
+      position: { lat: loc.lat, lng: loc.lng },
+      map, icon: pinSvg,
+      title: loc.name,
+    });
+    const infoWindow = new google.maps.InfoWindow({
+      content: `<div style="background:#161616;color:#F5F0E8;padding:12px;min-width:180px;font-family:monospace;font-size:11px">
+        <strong style="font-family:Arial Black,sans-serif;font-size:13px;display:block;margin-bottom:4px">${loc.name}</strong>
+        ${loc.address}<br>
+        <span style="color:#0F766E;margin-top:4px;display:block">⏱ ~${loc.waitMin} min wait</span>
+        <a href="#menu-section" style="color:#F5871F;display:block;margin-top:8px">Order →</a>
+      </div>`,
+    });
+    marker.addListener('click', () => {
+      infoWindow.open(map, marker);
+      highlightLocCard(i);
+    });
+  });
+}
+
+function highlightLocCard(idx) {
+  document.querySelectorAll('.loc-card').forEach((c, i) => c.classList.toggle('active', i === idx));
+}
+
+function useMyLocation() {
+  if (!navigator.geolocation) { alert('Geolocation is not supported by your browser.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      if (map) {
+        map.setCenter({ lat, lng });
+        map.setZoom(14);
+        new google.maps.Marker({ position: { lat, lng }, map, title: 'You are here',
+          icon: { path: google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: '#F5871F', fillOpacity: 1, strokeColor: '#F5F0E8', strokeWeight: 2 }
+        });
+      } else {
+        alert('Located you at ' + lat.toFixed(4) + ', ' + lng.toFixed(4) + '.\nNearest BK is 0.3 mi away. (Map requires Google Maps API key.)');
+      }
+    },
+    () => alert('Unable to retrieve your location.')
+  );
+}
+
+function searchLocation() {
+  const val = document.getElementById('locInput').value.trim();
+  if (!val) return;
+  if (!map || !window.google) {
+    alert('Map search requires a Google Maps API key in BKCONFIG.googleMapsKey');
+    return;
+  }
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: val }, (results, status) => {
+    if (status === 'OK') {
+      map.setCenter(results[0].geometry.location);
+      map.setZoom(14);
+    } else {
+      alert('Location not found: ' + val);
+    }
+  });
+  document.getElementById('locInput').value = '';
+}
+
+/* ─── NEWSLETTER ─── */
+async function subscribeNewsletter() {
+  const email = document.getElementById('nlEmail').value.trim();
+  if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+  const btn = document.querySelector('.nl-submit');
+  const orig = btn.textContent;
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    document.getElementById('nlEmail').value = '';
+    btn.textContent = '✓ Subscribed!';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+  } catch (err) {
+    if (err.message.includes('fetch')) {
+      alert('Newsletter requires the /api/subscribe serverless function to be deployed.\n\nDeploy to Vercel and configure MAILCHIMP_API_KEY.');
+    } else {
+      alert('Error: ' + err.message);
+    }
+    btn.textContent = orig; btn.disabled = false;
+  }
+}
+
+/* ─── ORDER SUCCESS BANNER ─── */
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('order') === 'success') {
+  const pts = urlParams.get('points') || 0;
+  const banner = document.createElement('div');
+  banner.className = 'order-success-banner';
+  banner.textContent = '✓ Order paid! You earned ' + pts + ' Crown Points 👑';
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 6000);
+  history.replaceState({}, '', window.location.pathname);
+}
+
+/* ─── LOAD GOOGLE MAPS SCRIPT DYNAMICALLY ─── */
+if (BKCONFIG.googleMapsKey !== 'YOUR_GOOGLE_MAPS_API_KEY') {
+  const s = document.createElement('script');
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${BKCONFIG.googleMapsKey}&callback=initMap`;
+  s.async = true; s.defer = true;
+  document.head.appendChild(s);
+}
+
 /* ─── NAV SCROLL ─── */
-window.addEventListener('scroll',()=>{
-  document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>20);
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
 });
 
 /* ─── MOBILE MENU ─── */
-const ham=document.getElementById('navHam');
-const mob=document.getElementById('mobileMenu');
-ham.addEventListener('click',()=>{
+const ham = document.getElementById('navHam');
+const mob = document.getElementById('mobileMenu');
+ham.addEventListener('click', () => {
   mob.classList.toggle('open');
-  const spans=ham.querySelectorAll('span');
-  if(mob.classList.contains('open')){
-    spans[0].style.transform='rotate(45deg) translate(5px,5px)';
-    spans[1].style.opacity='0';
-    spans[2].style.transform='rotate(-45deg) translate(5px,-5px)';
-  } else {
-    spans.forEach(s=>{s.style.transform='';s.style.opacity=''});
-  }
+  const spans = ham.querySelectorAll('span');
+  if (mob.classList.contains('open')) {
+    spans[0].style.transform = 'rotate(45deg) translate(5px,5px)';
+    spans[1].style.opacity = '0';
+    spans[2].style.transform = 'rotate(-45deg) translate(5px,-5px)';
+  } else { spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; }); }
 });
-function closeMobile(){mob.classList.remove('open');ham.querySelectorAll('span').forEach(s=>{s.style.transform='';s.style.opacity=''})}
+function closeMobile() {
+  mob.classList.remove('open');
+  ham.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+}
 
 /* ─── FLAME PARTICLES ─── */
-const colors=['#D62300','#F5871F','#FF6B00','#FF3300','#FFA500'];
-function spawnFlame(){
-  const c=document.getElementById('flameParticles');
-  if(!c)return;
-  const fp=document.createElement('div');
-  fp.className='fp';
-  fp.style.left=Math.random()*100+'%';
-  fp.style.height=(40+Math.random()*120)+'px';
-  fp.style.background=colors[Math.floor(Math.random()*colors.length)];
-  fp.style.animationDuration=(2+Math.random()*3)+'s';
-  fp.style.animationDelay=(Math.random()*2)+'s';
-  fp.style.width=(1+Math.random()*4)+'px';
+const colors = ['#D62300','#F5871F','#FF6B00','#FF3300','#FFA500'];
+function spawnFlame() {
+  const c = document.getElementById('flameParticles');
+  if (!c) return;
+  const fp = document.createElement('div');
+  fp.className = 'fp';
+  fp.style.left = Math.random() * 100 + '%';
+  fp.style.height = (40 + Math.random() * 120) + 'px';
+  fp.style.background = colors[Math.floor(Math.random() * colors.length)];
+  fp.style.animationDuration = (2 + Math.random() * 3) + 's';
+  fp.style.animationDelay = (Math.random() * 2) + 's';
+  fp.style.width = (1 + Math.random() * 4) + 'px';
   c.appendChild(fp);
-  setTimeout(()=>fp.remove(),5000);
+  setTimeout(() => fp.remove(), 5000);
 }
-setInterval(spawnFlame,200);
+setInterval(spawnFlame, 200);
 
 /* ─── COUNTDOWN TIMERS ─── */
-function getEndOfDay(){
-  const d=new Date();d.setHours(23,59,59,0);return d;
+function getEndOfDay() { const d = new Date(); d.setHours(23,59,59,0); return d; }
+const ends = [getEndOfDay(), new Date(getEndOfDay() - 3600000), new Date(getEndOfDay() - 7200000)];
+function formatTime(ms) {
+  if (ms < 0) return '00:00:00';
+  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000);
+  return [h,m,s].map(v => String(v).padStart(2,'0')).join(':');
 }
-const ends=[
-  new Date(getEndOfDay().getTime()),
-  new Date(getEndOfDay().getTime()-3600000),
-  new Date(getEndOfDay().getTime()-7200000),
-];
-function formatTime(ms){
-  if(ms<0)return '00:00:00';
-  const h=Math.floor(ms/3600000);
-  const m=Math.floor((ms%3600000)/60000);
-  const s=Math.floor((ms%60000)/1000);
-  return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':');
+function updateCountdowns() {
+  const now = Date.now();
+  ['cd1','cd2','cd3'].forEach((id, i) => { const el = document.getElementById(id); if (el) el.textContent = '⏱ ' + formatTime(ends[i] - now); });
 }
-function updateCountdowns(){
-  const now=Date.now();
-  ['cd1','cd2','cd3'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(el){el.textContent='⏱ '+formatTime(ends[i]-now);}
+setInterval(updateCountdowns, 1000); updateCountdowns();
+
+/* ─── QR MOCK ─── */
+const qr = document.getElementById('qrMock');
+if (qr) {
+  '11011101011101100000110111010111010101101011101001111011010001101011110'.split('').forEach(b => {
+    const c = document.createElement('div'); c.className = 'qr-cell' + (b === '0' ? ' w' : ''); qr.appendChild(c);
   });
 }
-setInterval(updateCountdowns,1000);updateCountdowns();
 
-/* ─── QR MOCK (decorative pattern) ─── */
-const qr=document.getElementById('qrMock');
-if(qr){
-  const pat='11011 10101 11011 00000 11011 10101 11011 01010 11010 11101 10011 10110 10010 11110 11001 11100 10110 10101 11101 10010 11010 00111 10011 10110'.replace(/ /g,'').split('');
-  pat.forEach(b=>{const c=document.createElement('div');c.className='qr-cell'+(b==='0'?' w':'');qr.appendChild(c);});
-}
+/* ─── MENU DATA ─── */
+const menuItems = [
+  {tab:'burgers',name:'Whopper®',desc:'A quarter-pound flame-grilled beef patty, fresh tomato, crisp lettuce.',price:'$5.99',cal:'657 cal',emoji:'🍔',flag:'bestseller',pair:'Add large fries?',tags:['all']},
+  {tab:'burgers',name:'Double Whopper®',desc:'Two flame-grilled patties, double the greatness.',price:'$7.49',cal:'902 cal',emoji:'🍔',flag:'fan',pair:'Try a milkshake?',tags:['all']},
+  {tab:'burgers',name:'Steakhouse Stack',desc:'Aged cheddar, crispy onions, smoky BK sauce.',price:'$8.99',cal:'820 cal',emoji:'🥩',flag:'',pair:'Add onion rings?',tags:['all']},
+  {tab:'burgers',name:'Impossible™ Whopper',desc:'100% plant-based patty, flame-grilled to perfection.',price:'$6.99',cal:'630 cal',emoji:'🌱',flag:'',pair:'Try plant-based nuggets?',tags:['all','veggie']},
+  {tab:'burgers',name:'Bacon Cheeseburger',desc:'Crispy bacon, melted American cheese, pickles, ketchup.',price:'$4.99',cal:'540 cal',emoji:'🥓',flag:'',pair:'Add large fries?',tags:['all']},
+  {tab:'burgers',name:'BK Veggie Burger',desc:'Garden-fresh vegetable patty with all the trimmings.',price:'$5.49',cal:'390 cal',emoji:'🥬',flag:'',pair:'Add a side salad?',tags:['all','veggie','lowcal']},
+  {tab:'chicken',name:'Crispy Chicken Sandwich',desc:'Hand-breaded crispy chicken breast on a brioche bun.',price:'$6.49',cal:'660 cal',emoji:'🍗',flag:'bestseller',pair:'Add coleslaw?',tags:['all']},
+  {tab:'chicken',name:'Fiery Chicken Sandwich',desc:'Double-breaded with ghost pepper coating.',price:'$7.49',cal:'740 cal',emoji:'🌶️',flag:'fan',pair:'Cool down with a milkshake?',tags:['all','spicy']},
+  {tab:'chicken',name:'Grilled Chicken Wrap',desc:'Flame-grilled chicken, mixed leaves, BK chipotle sauce.',price:'$6.99',cal:'430 cal',emoji:'🌯',flag:'',pair:'Try a side salad?',tags:['all','lowcal']},
+  {tab:'chicken',name:'Chicken Nuggets 9pc',desc:'Crispy on the outside, tender inside. Choose your dipping sauce.',price:'$5.49',cal:'480 cal',emoji:'🍖',flag:'',pair:'Add BBQ sauce?',tags:['all']},
+  {tab:'chicken',name:'Spicy Tendercrisp',desc:'Whole-muscle chicken breast with BK fiery seasoning.',price:'$8.49',cal:'700 cal',emoji:'🔥',flag:'',pair:'Add jalapeños?',tags:['all','spicy']},
+  {tab:'sides',name:'Large Fries',desc:'Golden, crispy, lightly salted.',price:'$3.49',cal:'430 cal',emoji:'🍟',flag:'bestseller',pair:'Add BK sauce?',tags:['all','veggie']},
+  {tab:'sides',name:'Onion Rings',desc:'Beer-battered Vidalia onion rings.',price:'$3.99',cal:'410 cal',emoji:'🧅',flag:'fan',pair:'Try our chipotle dip?',tags:['all','veggie']},
+  {tab:'sides',name:'Side Salad',desc:'Mixed greens, cherry tomatoes, cucumber.',price:'$2.99',cal:'80 cal',emoji:'🥗',flag:'',pair:'Add grilled chicken?',tags:['all','veggie','lowcal']},
+  {tab:'sides',name:'Mac & Cheetos',desc:'Creamy mac in a crispy Cheetos shell.',price:'$3.29',cal:'290 cal',emoji:'🧀',flag:'',pair:'Add a drink?',tags:['all','veggie']},
+  {tab:'drinks',name:'Large Coca-Cola',desc:'Ice cold. The perfect flame-grilled companion.',price:'$2.49',cal:'290 cal',emoji:'🥤',flag:'bestseller',pair:'',tags:['all','veggie']},
+  {tab:'drinks',name:'Chocolate Milkshake',desc:'Thick, creamy, hand-spun.',price:'$3.99',cal:'580 cal',emoji:'🥛',flag:'fan',pair:'Add whipped cream?',tags:['all','veggie']},
+  {tab:'drinks',name:'Fresh Orange Juice',desc:'100% squeezed. No added sugar.',price:'$3.29',cal:'190 cal',emoji:'🍊',flag:'',pair:'',tags:['all','veggie','lowcal']},
+  {tab:'drinks',name:'BK Iced Coffee',desc:'Cold-brew with your choice of milk.',price:'$3.49',cal:'110 cal',emoji:'☕',flag:'',pair:'Add an extra shot?',tags:['all','veggie','lowcal']},
+  {tab:'desserts',name:'OREO® Cheesecake',desc:'Creamy cheesecake on a crumbled OREO base.',price:'$3.49',cal:'390 cal',emoji:'🍰',flag:'bestseller',pair:'Add a milkshake?',tags:['all','veggie']},
+  {tab:'desserts',name:'Soft Serve Cone',desc:'Classic vanilla soft serve.',price:'$1.49',cal:'170 cal',emoji:'🍦',flag:'',pair:'',tags:['all','veggie','lowcal']},
+  {tab:'desserts',name:'Chocolate Brownie',desc:'Warm, fudgy, with a hint of sea salt.',price:'$2.99',cal:'450 cal',emoji:'🍫',flag:'fan',pair:'Add ice cream?',tags:['all','veggie']},
+];
 
 /* ─── MENU RENDERING ─── */
-let activeTab='burgers';let activeFilter='all';let cart=[];
-function renderMenu(){
-  const grid=document.getElementById('menuGrid');
-  grid.innerHTML='';
-  const filtered=menuItems.filter(i=>i.tab===activeTab&&i.tags.includes(activeFilter));
-  filtered.forEach((item,idx)=>{
-    const card=document.createElement('div');
-    card.className='menu-card show';
-    const grad=item.tab==='burgers'?'linear-gradient(160deg,#2D0000,#0D0000)':
-                item.tab==='chicken'?'linear-gradient(160deg,#2D1400,#0D0600)':
-                item.tab==='sides'?'linear-gradient(160deg,#1A1A00,#080800)':
-                item.tab==='drinks'?'linear-gradient(160deg,#001A2D,#000D18)':
-                'linear-gradient(160deg,#1A0020,#0D0010)';
-    card.style='--card-grad:'+grad;
-    card.innerHTML=`
+let activeTab = 'burgers'; let activeFilter = 'all';
+
+function renderMenu() {
+  const grid = document.getElementById('menuGrid');
+  grid.innerHTML = '';
+  const filtered = menuItems.filter(i => i.tab === activeTab && i.tags.includes(activeFilter));
+  filtered.forEach((item, idx) => {
+    const grad = activeTab === 'burgers' ? 'linear-gradient(160deg,#2D0000,#0D0000)' :
+                 activeTab === 'chicken' ? 'linear-gradient(160deg,#2D1400,#0D0600)' :
+                 activeTab === 'sides'   ? 'linear-gradient(160deg,#1A1A00,#080800)' :
+                 activeTab === 'drinks'  ? 'linear-gradient(160deg,#001A2D,#000D18)' :
+                                          'linear-gradient(160deg,#1A0020,#0D0010)';
+    const card = document.createElement('div');
+    card.className = 'menu-card show';
+    card.innerHTML = `
       <div class="menu-card-img" style="background:${grad}">
         <span class="menu-emoji">${item.emoji}</span>
-        ${item.flag==='bestseller'?'<div class="bestseller-flag">Best Seller</div>':''}
-        ${item.flag==='fan'?'<div class="fan-flag">Fan Fave</div>':''}
+        ${item.flag === 'bestseller' ? '<div class="bestseller-flag">Best Seller</div>' : ''}
+        ${item.flag === 'fan'        ? '<div class="fan-flag">Fan Fave</div>' : ''}
       </div>
       <div class="menu-card-body">
         <div class="menu-item-name">${item.name}</div>
@@ -1829,84 +2219,41 @@ function renderMenu(){
             <div class="menu-price">${item.price}</div>
             <div class="menu-cal">${item.cal}</div>
           </div>
-          <button class="quick-add" id="qa${idx}" onclick="addToCart('${item.name.replace(/'/g,"\\'")}','${item.price}',${idx})" title="Quick add">+</button>
+          <button class="quick-add" id="qa${idx}" onclick="addToCart('${item.name.replace(/'/g,"\\'")}','${item.price}',${idx},'${item.emoji}')" title="Quick add">+</button>
         </div>
       </div>
-      ${item.pair?`<div class="pair-hint">🤝 Pair with: ${item.pair}</div>`:''}
+      ${item.pair ? `<div class="pair-hint">🤝 Pair with: ${item.pair}</div>` : ''}
     `;
     grid.appendChild(card);
   });
-  if(filtered.length===0){
-    grid.innerHTML='<div style="grid-column:1/-1;padding:48px;text-align:center;font-family:monospace;font-size:11px;letter-spacing:2px;color:var(--muted)">NO ITEMS MATCH THIS FILTER</div>';
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:48px;text-align:center;font-family:monospace;font-size:11px;letter-spacing:2px;color:rgba(245,240,232,0.3)">NO ITEMS MATCH THIS FILTER</div>';
   }
 }
 
-document.querySelectorAll('.menu-tab').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.menu-tab').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeTab=btn.dataset.tab;
-    renderMenu();
+document.querySelectorAll('.menu-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.menu-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); activeTab = btn.dataset.tab; renderMenu();
   });
 });
-document.querySelectorAll('.diet-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.diet-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter=btn.dataset.filter;
-    renderMenu();
+document.querySelectorAll('.diet-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.diet-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); activeFilter = btn.dataset.filter; renderMenu();
   });
 });
 renderMenu();
 
-/* ─── CART ─── */
-function addToCart(name,price,idx){
-  cart.push({name,price});
-  const count=document.getElementById('cartCount');
-  count.textContent=cart.length;
-  count.classList.add('show');
-  // Quick-add flash
-  if(idx!==undefined){
-    const btn=document.getElementById('qa'+idx);
-    if(btn){btn.classList.add('added');btn.textContent='✓';setTimeout(()=>{btn.classList.remove('added');btn.textContent='+';},800);}
-  }
-  showToast(name,price);
-}
-let toastTimer;
-function showToast(name,price){
-  clearTimeout(toastTimer);
-  document.getElementById('toastItem').textContent=name;
-  const total=cart.reduce((s,i)=>s+parseFloat(i.price.replace('$','')),0);
-  document.getElementById('toastTotal').textContent='$'+total.toFixed(2)+' total';
-  const t=document.getElementById('cartToast');
-  t.classList.add('show');
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
-}
-
-/* ─── LOCATION SEARCH ─── */
-function searchLocation(){
-  const v=document.getElementById('locInput').value.trim();
-  if(!v)return;
-  document.getElementById('locInput').value='';
-  alert('Searching for BK locations near "'+v+'" — GPS integration would fire here.');
-}
-function useMyLocation(){
-  alert('Location permission requested — nearest BK restaurants would appear here.');
-}
-
-/* ─── NEWSLETTER ─── */
-function subscribeNewsletter(){
-  const email=document.getElementById('nlEmail').value.trim();
-  if(!email||!email.includes('@')){alert('Please enter a valid email address.');return;}
-  document.getElementById('nlEmail').value='';
-  alert('Welcome to the Kingdom, '+email+'! Check your inbox for your free item code. 🔥');
-}
+/* ─── CART BUTTON OPENS PANEL ─── */
+document.getElementById('cartBtn').onclick = openCart;
 
 /* ─── LOC CARD ACTIVE ─── */
-document.querySelectorAll('.loc-card').forEach(card=>{
-  card.addEventListener('click',()=>{
-    document.querySelectorAll('.loc-card').forEach(c=>c.classList.remove('active'));
+document.querySelectorAll('.loc-card').forEach((card, i) => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.loc-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
+    if (map) map.setCenter({ lat: bkLocations[i].lat, lng: bkLocations[i].lng });
   });
 });
 </script>
