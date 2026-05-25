@@ -906,7 +906,85 @@ ul{list-style:none}
   .trust-top{flex-direction:column;gap:24px}
   .trust-divider{display:none}
 }
+
+/* ── CART PANEL ── */
+.cart-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 380px; max-width: 100vw;
+  background: #161616; z-index: 300; transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(.25,.46,.45,.94);
+  display: flex; flex-direction: column;
+  border-left: 1px solid rgba(245,240,232,0.1);
+  box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+}
+.cart-panel.open { transform: translateX(0); }
+.cart-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 299;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.cart-overlay.show { opacity: 1; pointer-events: all; }
+.cart-header { display: flex; align-items: center; justify-content: space-between; padding: 24px; border-bottom: 1px solid rgba(245,240,232,0.08); }
+.cart-header h3 { font-family: 'Arial Black','Arial Bold',sans-serif; font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.3px; }
+.cart-close { background: transparent; color: rgba(245,240,232,0.5); font-size: 24px; padding: 4px; transition: color 0.15s; }
+.cart-close:hover { color: #F5F0E8; }
+.cart-items-list { flex: 1; overflow-y: auto; padding: 16px 24px; }
+.cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; font-family: monospace; font-size: 11px; letter-spacing: 2px; color: rgba(245,240,232,0.3); text-transform: uppercase; }
+.cart-empty-icon { font-size: 48px; }
+.cart-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(245,240,232,0.06); }
+.cart-item-emoji { font-size: 28px; flex-shrink: 0; }
+.cart-item-info { flex: 1; min-width: 0; }
+.cart-item-name { font-family: 'Arial Black','Arial Bold',sans-serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.2px; }
+.cart-item-price { font-family: monospace; font-size: 11px; color: #F5871F; margin-top: 2px; }
+.cart-qty-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.qty-btn { width: 24px; height: 24px; background: rgba(245,240,232,0.08); border: 1px solid rgba(245,240,232,0.12); color: #F5F0E8; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.qty-btn:hover { background: #D62300; border-color: #D62300; }
+.qty-val { font-family: monospace; font-size: 12px; width: 20px; text-align: center; }
+.cart-footer { padding: 20px 24px; border-top: 1px solid rgba(245,240,232,0.08); }
+.cart-subtotal { display: flex; justify-content: space-between; margin-bottom: 8px; font-family: monospace; font-size: 11px; color: rgba(245,240,232,0.5); }
+.cart-total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+.cart-total-label { font-family: 'Arial Black','Arial Bold',sans-serif; font-size: 13px; font-weight: 900; text-transform: uppercase; }
+.cart-total-val { font-family: 'Arial Black','Arial Bold',sans-serif; font-size: 24px; font-weight: 900; color: #F5871F; }
+.checkout-btn { width: 100%; background: #D62300; color: #F5F0E8; font-family: 'Arial Black','Arial Bold',sans-serif; font-size: 14px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; padding: 16px; transition: background 0.15s; }
+.checkout-btn:hover { background: #9E1A00; }
+.checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.cart-stripe-note { font-family: monospace; font-size: 9px; letter-spacing: 1px; color: rgba(245,240,232,0.3); text-align: center; margin-top: 10px; }
+
+/* ── AUTH MODAL ── */
+.auth-modal { position: fixed; inset: 0; z-index: 400; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.auth-modal.open { opacity: 1; pointer-events: all; }
+.auth-box { background: #161616; border: 1px solid rgba(245,240,232,0.12); width: 400px; max-width: calc(100vw - 40px); padding: 36px; position: relative; }
+.auth-close { position: absolute; top: 16px; right: 16px; background: transparent; color: rgba(245,240,232,0.4); font-size: 20px; }
+.auth-logo { font-family: 'Arial Black','Arial Bold',sans-serif; font-size: 18px; font-weight: 900; text-transform: uppercase; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
+.auth-tabs { display: flex; margin-bottom: 24px; border-bottom: 1px solid rgba(245,240,232,0.08); }
+.auth-tab-btn { flex: 1; background: transparent; color: rgba(245,240,232,0.4); font-family: monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 10px; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+.auth-tab-btn.active { color: #F5871F; border-bottom-color: #F5871F; }
+.auth-field { margin-bottom: 14px; }
+.auth-label { font-family: monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: rgba(245,240,232,0.4); display: block; margin-bottom: 6px; }
+.auth-input { width: 100%; background: rgba(245,240,232,0.05); border: 1px solid rgba(245,240,232,0.1); color: #F5F0E8; font-family: Georgia,serif; font-size: 14px; padding: 11px 14px; outline: none; transition: border-color 0.2s; }
+.auth-input:focus { border-color: #F5871F; }
+.auth-submit { width: 100%; background: #D62300; color: #F5F0E8; font-family: 'Arial Black','Arial Bold',sans-serif; font-size: 13px; font-weight: 900; text-transform: uppercase; padding: 14px; margin-top: 8px; transition: background 0.15s; }
+.auth-submit:hover { background: #9E1A00; }
+.auth-error { font-family: monospace; font-size: 10px; color: #F5871F; margin-top: 10px; letter-spacing: 1px; min-height: 16px; }
+.auth-divider { text-align: center; font-family: monospace; font-size: 9px; letter-spacing: 2px; color: rgba(245,240,232,0.3); margin: 16px 0; }
+
+/* ── USER PILL IN NAV ── */
+.nav-auth-btn { background: transparent; color: rgba(245,240,232,0.6); font-family: monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 14px; border: 1px solid rgba(245,240,232,0.2); transition: all 0.15s; }
+.nav-auth-btn:hover { border-color: rgba(245,240,232,0.5); color: #F5F0E8; }
+.user-pill { display: flex; align-items: center; gap: 8px; background: rgba(245,135,31,0.1); border: 1px solid rgba(245,135,31,0.3); padding: 5px 12px; cursor: pointer; font-family: monospace; font-size: 10px; letter-spacing: 1px; transition: all 0.15s; }
+.user-pill:hover { background: rgba(245,135,31,0.18); }
+.user-pts { color: #F5871F; font-weight: 700; }
+
+/* ── ORDER SUCCESS BANNER ── */
+.order-success-banner { position: fixed; top: calc(var(--nav-h) + 36px + 12px); left: 50%; transform: translateX(-50%); z-index: 200; background: #0F766E; border: 1px solid rgba(15,118,110,0.6); padding: 14px 28px; font-family: monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; animation: slideDown 0.4s ease; white-space: nowrap; }
+@keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-16px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* ── GOOGLE MAP PLACEHOLDER ── */
+#bk-map { display: none; }
+#bk-map.loaded { display: block; }
+#mapPlaceholder { position: absolute; inset: 0; }
+#mapPlaceholder.hidden { display: none; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 
@@ -943,6 +1021,12 @@ ul{list-style:none}
       <li><a href="#story">Our Story</a></li>
     </ul>
     <div class="nav-actions">
+      <button class="nav-auth-btn" id="authBtn" onclick="openAuthModal()">Sign In</button>
+      <div class="user-pill" id="userPill" style="display:none" onclick="signOut()">
+        <span>👑</span>
+        <span id="navUserName">User</span>
+        <span class="user-pts" id="navUserPts">0 pts</span>
+      </div>
       <button class="cart-btn" id="cartBtn" aria-label="Cart">
         🛒
         <span class="cart-count" id="cartCount">0</span>
