@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BURGER KING® — Flame-Grilled Since 1954</title>
+<style>
+/* ══════════════════════════════════════════
+   RESET & TOKENS
+══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#D62300;
+  --red-dark:#9E1A00;
+  --orange:#F5871F;
+  --orange-light:#FFA94D;
+  --cream:#F5F0E8;
+  --black:#0D0D0D;
+  --ink:#1A1A1A;
+  --muted:rgba(245,240,232,0.55);
+  --border:rgba(245,240,232,0.1);
+  --card-bg:#161616;
+  --nav-h:68px;
+  --r:0px;
+  --ease:cubic-bezier(.25,.46,.45,.94);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background:var(--black);
+  color:var(--cream);
+  font-family:Georgia,serif;
+  overflow-x:hidden;
+  line-height:1.5;
+}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+img{display:block;max-width:100%}
+ul{list-style:none}
+
+/* ══════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════ */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.container{max-width:1140px;margin:0 auto;padding:0 32px}
+.section{padding:96px 0}
+.section-label{
+  font-family:monospace;font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--orange);margin-bottom:12px;
+  display:block;
+}
+.section-title{
+  font-size:clamp(32px,4.5vw,56px);font-family:'Arial Black','Arial Bold',sans-serif;
+  font-weight:900;line-height:1;letter-spacing:-1px;
+  text-transform:uppercase;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-weight:900;font-size:13px;letter-spacing:1px;text-transform:uppercase;
+  padding:14px 28px;transition:all .18s var(--ease);cursor:pointer;
+}
+.btn-primary{background:var(--red);color:var(--cream)}
+.btn-primary:hover{background:var(--red-dark);transform:translateY(-2px)}
+.btn-secondary{background:transparent;color:var(--cream);border:2px solid var(--cream)}
+.btn-secondary:hover{background:var(--cream);color:var(--black);transform:translateY(-2px)}
+.btn-orange{background:var(--orange);color:var(--black)}
+.btn-orange:hover{background:var(--orange-light);transform:translateY(-2px)}
+.tag{
+  font-family:monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  padding:3px 10px;border:1px solid currentColor;display:inline-block;
+}
+
+/* ══════════════════════════════════════════
+   DEAL RIBBON
+══════════════════════════════════════════ */
+.deal-ribbon{
+  background:var(--orange);color:var(--black);
+  font-family:monospace;font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;
+  padding:8px 0;overflow:hidden;white-space:nowrap;
+  position:relative;z-index:200;
+}
+.deal-ribbon-track{
+  display:inline-block;
+  animation:marquee 30s linear infinite;
+}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ribbon-sep{margin:0 24px;opacity:.4}
+
+/* ══════════════════════════════════════════
+   STICKY NAV
+══════════════════════════════════════════ */
+.nav{
+  position:sticky;top:0;z-index:100;height:var(--nav-h);
+  background:rgba(13,13,13,.97);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  transition:box-shadow .3s;
+}
+.nav.scrolled{box-shadow:0 4px 40px rgba(0,0,0,.6)}
+.nav-inner{
+  width:100%;max-width:1140px;margin:0 auto;
+  padding:0 32px;
+  display:flex;align-items:center;gap:0;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:18px;font-weight:900;letter-spacing:-0.5px;
+  text-transform:uppercase;flex-shrink:0;margin-right:auto;
+}
+.logo-flame{font-size:26px;line-height:1}
+.nav-links{
+  display:flex;align-items:center;gap:0;
+  list-style:none;
+}
+.nav-links a{
+  display:block;padding:8px 16px;
+  font-family:monospace;font-size:11px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);
+  transition:color .15s;
+}
+.nav-links a:hover{color:var(--cream)}
+.nav-actions{display:flex;align-items:center;gap:12px;margin-left:16px}
+.cart-btn{
+  position:relative;background:transparent;color:var(--cream);
+  font-size:20px;padding:4px;line-height:1;
+}
+.cart-count{
+  position:absolute;top:-4px;right:-6px;
+  background:var(--red);color:var(--cream);
+  font-family:monospace;font-size:9px;font-weight:700;
+  width:16px;height:16px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(.6);transition:all .2s;
+}
+.cart-count.show{opacity:1;transform:scale(1)}
+.nav-order-btn{
+  background:var(--red);color:var(--cream);
+  font-family:monospace;font-size:10px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;padding:8px 18px;
+  transition:background .15s;
+}
+.nav-order-btn:hover{background:var(--red-dark)}
+.nav-ham{display:none;flex-direction:column;gap:5px;background:transparent;padding:4px}
+.nav-ham span{display:block;width:22px;height:2px;background:var(--cream);transition:all .2s}
+.mobile-menu{
+  display:none;position:fixed;inset:0;top:var(--nav-h);
+  background:rgba(13,13,13,.98);z-index:99;
+  padding:32px;flex-direction:column;gap:24px;
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a{
+  font-family:'Arial Black','Arial Bold',sans-serif;font-size:28px;
+  font-weight:900;text-transform:uppercase;letter-spacing:-1px;
+  border-bottom:1px solid var(--border);padding-bottom:20px;
+}
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+.hero{
+  min-height:calc(100vh - var(--nav-h) - 36px);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;
+  background:var(--black);
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 65% 60%, rgba(214,35,0,.22) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 40% at 75% 80%, rgba(245,135,31,.15) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(120,10,0,.3) 0%, transparent 60%),
+    linear-gradient(160deg,#1a0500 0%,#0d0d0d 50%,#0a0a0a 100%);
+}
+.flame-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.fp{
+  position:absolute;bottom:-20px;
+  width:3px;border-radius:50% 50% 20% 20%;
+  animation:flameRise linear infinite;
+  opacity:0;
+  transform-origin:bottom center;
+}
+@keyframes flameRise{
+  0%{opacity:0;transform:scaleX(1) translateY(0)}
+  15%{opacity:.7}
+  70%{opacity:.3;transform:scaleX(.5) translateY(-200px)}
+  100%{opacity:0;transform:scaleX(.2) translateY(-400px)}
+}
+.hero-content{
+  position:relative;z-index:2;
+  max-width:1140px;margin:0 auto;padding:80px 32px;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+}
+.hero-text{}
+.hero-eyebrow{
+  font-family:monospace;font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--orange);margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+}
+.hero-eyebrow::before{content:'';display:block;width:24px;height:2px;background:var(--orange)}
+.hero-h1{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:clamp(52px,8vw,104px);
+  font-weight:900;line-height:.92;
+  letter-spacing:-3px;text-transform:uppercase;
+  margin-bottom:24px;
+}
+.hero-h1 .line2{color:var(--orange)}
+.hero-h1 .line3{
+  -webkit-text-stroke:2px var(--cream);
+  color:transparent;
+}
+.hero-sub{
+  font-size:17px;color:var(--muted);
+  line-height:1.65;max-width:420px;margin-bottom:36px;
+}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.hero-stats{
+  display:flex;gap:28px;padding-top:28px;
+  border-top:1px solid var(--border);
+}
+.hstat-val{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:28px;font-weight:900;color:var(--orange);line-height:1;
+}
+.hstat-label{font-family:monospace;font-size:10px;letter-spacing:1px;color:var(--muted);margin-top:4px}
+.hero-visual{
+  display:flex;justify-content:center;align-items:center;
+  position:relative;
+}
+.burger-showcase{
+  width:320px;height:320px;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.burger-glow{
+  position:absolute;inset:-20px;
+  background:radial-gradient(circle,rgba(214,35,0,.35) 0%,rgba(245,135,31,.15) 40%,transparent 70%);
+  animation:pulseGlow 3s ease-in-out infinite;
+}
+@keyframes pulseGlow{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+.burger-emoji{
+  font-size:200px;line-height:1;
+  filter:drop-shadow(0 20px 60px rgba(214,35,0,.5));
+  animation:burgerFloat 4s ease-in-out infinite;
+  position:relative;z-index:1;
+}
+@keyframes burgerFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-16px) rotate(3deg)}}
+.hero-badge{
+  position:absolute;top:20px;right:-20px;
+  background:var(--orange);color:var(--black);
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;
+  padding:10px 14px;text-align:center;line-height:1.2;
+  animation:badgePop .6s var(--ease) .5s both;
+}
+@keyframes badgePop{from{opacity:0;transform:scale(.7) rotate(-6deg)}to{opacity:1;transform:scale(1) rotate(-6deg)}}
+.hero-price-tag{
+  position:absolute;bottom:30px;left:-10px;
+  background:var(--red);color:var(--cream);
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  padding:12px 18px;
+  animation:badgePop .6s var(--ease) .8s both;
+}
+.price-from{font-size:9px;font-family:monospace;letter-spacing:2px;opacity:.7}
+.price-val{font-size:28px;font-weight:900;line-height:1}
+
+/* ══════════════════════════════════════════
+   TRUST / SOCIAL PROOF
+══════════════════════════════════════════ */
+.trust{
+  background:var(--ink);
+  padding:80px 0;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.trust-top{
+  display:flex;align-items:center;gap:48px;flex-wrap:wrap;
+  margin-bottom:60px;
+}
+.trust-rating{display:flex;flex-direction:column;gap:6px}
+.stars{font-size:28px;letter-spacing:2px;color:var(--orange)}
+.rating-val{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:48px;font-weight:900;line-height:1;
+}
+.rating-count{font-family:monospace;font-size:11px;letter-spacing:1px;color:var(--muted)}
+.trust-divider{width:1px;height:80px;background:var(--border)}
+.trust-claim{flex:1;min-width:240px}
+.claim-badge{
+  display:inline-block;
+  background:var(--orange);color:var(--black);
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:13px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;
+  padding:10px 18px;margin-bottom:14px;
+}
+.claim-text{font-size:15px;color:var(--muted);line-height:1.65;max-width:340px}
+.trust-counts{display:flex;gap:40px;flex-wrap:wrap}
+.tc-val{font-family:'Arial Black','Arial Bold',sans-serif;font-size:36px;font-weight:900;color:var(--orange);line-height:1}
+.tc-label{font-family:monospace;font-size:10px;letter-spacing:1px;color:var(--muted);margin-top:4px}
+.press-strip{
+  border-top:1px solid var(--border);padding-top:32px;
+  display:flex;gap:0;align-items:center;flex-wrap:wrap;
+}
+.press-label{
+  font-family:monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--muted);
+  margin-right:32px;flex-shrink:0;
+}
+.press-logos{display:flex;gap:32px;flex-wrap:wrap;align-items:center}
+.press-logo{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:13px;font-weight:900;letter-spacing:-0.5px;
+  color:rgba(245,240,232,0.3);text-transform:uppercase;
+  transition:color .2s;
+}
+.press-logo:hover{color:rgba(245,240,232,0.6)}
+.ugc-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);
+  gap:4px;margin-top:48px;overflow:hidden;
+}
+.ugc-cell{
+  aspect-ratio:1;position:relative;overflow:hidden;
+  cursor:pointer;
+}
+.ugc-cell::before{
+  content:'';position:absolute;inset:0;
+  background:var(--bg);transition:opacity .3s;
+}
+.ugc-cell:hover::before{opacity:.6}
+.ugc-cell span{
+  position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;
+  font-size:40px;
+}
+.ugc-cell .ugc-overlay{
+  position:absolute;inset:0;background:rgba(13,13,13,.65);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .3s;
+  font-family:monospace;font-size:10px;letter-spacing:1px;color:var(--cream);text-align:center;padding:8px;
+}
+.ugc-cell:hover .ugc-overlay{opacity:1}
+
+/* ══════════════════════════════════════════
+   DEALS — THE HOT ZONE
+══════════════════════════════════════════ */
+.deals{background:var(--black);padding:96px 0}
+.deals-header{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-bottom:48px;gap:24px;flex-wrap:wrap;
+}
+.today-strip{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--red);padding:8px 18px;
+  font-family:monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  animation:stripPulse 2s ease-in-out infinite;
+}
+@keyframes stripPulse{0%,100%{opacity:1}50%{opacity:.8}}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--cream);animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.deals-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  margin-bottom:32px;
+}
+.deal-card{
+  background:var(--card-bg);border:1px solid var(--border);
+  position:relative;overflow:hidden;
+  transition:transform .2s var(--ease),border-color .2s;
+  cursor:pointer;
+}
+.deal-card:hover{transform:translateY(-4px);border-color:var(--red)}
+.deal-card-img{
+  aspect-ratio:4/3;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.deal-card-img::before{content:'';position:absolute;inset:0;background:var(--grad)}
+.deal-card-img .deal-emoji{
+  font-size:80px;position:relative;z-index:1;
+  filter:drop-shadow(0 8px 20px rgba(0,0,0,.5));
+}
+.deal-flag{
+  position:absolute;top:16px;left:0;
+  background:var(--red);
+  font-family:monospace;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:4px 12px;color:var(--cream);
+}
+.deal-countdown{
+  position:absolute;bottom:0;right:0;
+  background:rgba(13,13,13,.9);
+  font-family:monospace;font-size:11px;font-weight:700;color:var(--orange);
+  padding:6px 12px;letter-spacing:1px;
+}
+.deal-body{padding:20px}
+.deal-name{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:17px;font-weight:900;text-transform:uppercase;
+  letter-spacing:-.3px;margin-bottom:6px;line-height:1.1;
+}
+.deal-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.deal-price-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+}
+.deal-was{
+  font-family:monospace;font-size:11px;color:var(--muted);
+  text-decoration:line-through;
+}
+.deal-now{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:22px;font-weight:900;color:var(--orange);line-height:1;
+}
+.deal-add-btn{
+  background:var(--red);color:var(--cream);
+  font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:8px 16px;transition:background .15s;
+}
+.deal-add-btn:hover{background:var(--red-dark)}
+.app-deal-card{
+  background:linear-gradient(135deg,#1A0800 0%,#2D1200 40%,#1A0800 100%);
+  border:1px solid rgba(245,135,31,.3);
+  padding:32px;
+  display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;
+}
+.app-deal-eyebrow{
+  font-family:monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--orange);margin-bottom:8px;
+}
+.app-deal-title{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:-.5px;
+  margin-bottom:8px;line-height:1.1;
+}
+.app-deal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.qr-mock{
+  width:80px;height:80px;flex-shrink:0;
+  background:var(--cream);padding:6px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:2px;
+}
+.qr-cell{background:var(--black);border-radius:1px}
+.qr-cell.w{background:var(--cream)}
+
+/* ══════════════════════════════════════════
+   MENU — THE FLAME MENU
+══════════════════════════════════════════ */
+.menu-section{background:var(--ink);padding:96px 0}
+.menu-controls{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:36px;
+}
+.menu-tabs{
+  display:flex;gap:4px;flex-wrap:wrap;
+}
+.menu-tab{
+  background:transparent;color:var(--muted);
+  font-family:monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:8px 18px;border:1px solid var(--border);
+  transition:all .15s;
+}
+.menu-tab:hover{border-color:rgba(245,240,232,0.3);color:var(--cream)}
+.menu-tab.active{background:var(--red);color:var(--cream);border-color:var(--red)}
+.diet-filters{display:flex;gap:8px;flex-wrap:wrap}
+.diet-btn{
+  background:transparent;color:var(--muted);
+  font-family:monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:6px 14px;border:1px solid var(--border);
+  transition:all .15s;
+}
+.diet-btn:hover,.diet-btn.active{background:rgba(245,135,31,.1);border-color:var(--orange);color:var(--orange)}
+.menu-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;
+}
+.menu-card{
+  background:var(--card-bg);border:1px solid var(--border);
+  position:relative;overflow:hidden;
+  transition:transform .2s var(--ease),border-color .2s;
+  display:none;
+}
+.menu-card.show{display:block}
+.menu-card:hover{transform:translateY(-3px);border-color:rgba(245,135,31,.3)}
+.menu-card-img{
+  aspect-ratio:1;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.menu-card-img::before{content:'';position:absolute;inset:0;background:var(--card-grad)}
+.menu-emoji{font-size:72px;position:relative;z-index:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
+.bestseller-flag{
+  position:absolute;top:12px;right:0;
+  background:var(--orange);color:var(--black);
+  font-family:monospace;font-size:8px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;padding:3px 10px;
+}
+.fan-flag{
+  position:absolute;top:12px;right:0;
+  background:var(--red);color:var(--cream);
+  font-family:monospace;font-size:8px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;padding:3px 10px;
+}
+.menu-card-body{padding:16px}
+.menu-item-name{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:-.3px;
+  margin-bottom:4px;line-height:1.15;
+}
+.menu-item-desc{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4}
+.menu-card-footer{display:flex;align-items:center;justify-content:space-between}
+.menu-price{font-family:'Arial Black','Arial Bold',sans-serif;font-size:18px;font-weight:900;color:var(--orange)}
+.menu-cal{font-family:monospace;font-size:9px;color:var(--muted);letter-spacing:1px}
+.quick-add{
+  background:var(--red);color:var(--cream);width:32px;height:32px;
+  font-size:18px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;
+}
+.quick-add:hover{background:var(--red-dark);transform:scale(1.1)}
+.quick-add.added{background:var(--orange);animation:addPop .3s var(--ease)}
+@keyframes addPop{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1)}}
+.pair-hint{
+  padding:10px 16px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+  font-family:monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;
+}
+
+/* Cart toast */
+.cart-toast{
+  position:fixed;bottom:32px;right:32px;z-index:500;
+  background:var(--card-bg);border:1px solid var(--border);
+  padding:16px 20px;
+  display:flex;align-items:center;gap:14px;
+  transform:translateY(120px);opacity:0;
+  transition:all .3s var(--ease);
+  pointer-events:none;max-width:300px;
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+}
+.cart-toast.show{transform:translateY(0);opacity:1}
+.toast-icon{font-size:24px}
+.toast-msg{font-size:12px;line-height:1.4}
+.toast-item{font-weight:700;color:var(--orange)}
+
+/* ══════════════════════════════════════════
+   APP — THE ROYAL APP
+══════════════════════════════════════════ */
+.app-section{background:var(--black);padding:96px 0}
+.app-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
+}
+.app-benefits{display:flex;flex-direction:column;gap:20px;margin:32px 0}
+.benefit-row{display:flex;gap:16px;align-items:flex-start}
+.benefit-icon{
+  width:40px;height:40px;background:rgba(245,135,31,.12);
+  border:1px solid rgba(245,135,31,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.benefit-title{font-family:'Arial Black','Arial Bold',sans-serif;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
+.benefit-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.app-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
+.store-btn{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card-bg);border:1px solid var(--border);
+  padding:10px 18px;transition:all .2s;
+}
+.store-btn:hover{border-color:var(--orange);transform:translateY(-2px)}
+.store-icon{font-size:24px}
+.store-text{line-height:1.2}
+.store-sub{font-family:monospace;font-size:9px;letter-spacing:1px;color:var(--muted)}
+.store-name{font-family:'Arial Black','Arial Bold',sans-serif;font-size:13px;font-weight:900}
+.loyalty-tiers{
+  display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;
+}
+.tier{
+  flex:1;min-width:80px;
+  border:1px solid var(--border);padding:16px 12px;text-align:center;
+}
+.tier-icon{font-size:24px;margin-bottom:6px}
+.tier-name{font-family:monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.tier.highlight{border-color:var(--orange);background:rgba(245,135,31,.06)}
+.tier.highlight .tier-name{color:var(--orange)}
+.phone-mockup{
+  position:relative;
+  display:flex;justify-content:center;
+}
+.phone-frame{
+  width:240px;
+  background:var(--ink);
+  border:2px solid rgba(245,240,232,0.15);
+  border-radius:36px;overflow:hidden;
+  position:relative;
+  box-shadow:0 40px 80px rgba(0,0,0,.7),0 0 0 1px rgba(245,240,232,.04);
+}
+.phone-notch{
+  width:80px;height:24px;
+  background:var(--ink);
+  border-radius:0 0 16px 16px;
+  margin:0 auto;position:relative;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+}
+.phone-screen{background:#111;padding:0 16px 24px;min-height:460px}
+.app-status{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0 12px;font-size:10px;font-family:monospace;color:var(--muted);
+}
+.app-nav-bar{
+  background:var(--red);padding:12px 0;text-align:center;
+  font-family:'Arial Black','Arial Bold',sans-serif;font-size:14px;
+  font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin:0 -16px 16px;
+}
+.app-card{background:var(--card-bg);padding:12px;margin-bottom:10px;border-radius:4px}
+.app-card-img{
+  background:linear-gradient(135deg,#3D0000,#1A0000);
+  height:90px;display:flex;align-items:center;justify-content:center;
+  font-size:48px;border-radius:2px;margin-bottom:8px;
+}
+.app-card-name{font-family:'Arial Black','Arial Bold',sans-serif;font-size:11px;font-weight:900;text-transform:uppercase}
+.app-card-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.app-card-pts{font-family:monospace;font-size:9px;color:var(--orange)}
+.app-card-price{font-family:'Arial Black','Arial Bold',sans-serif;font-size:13px;color:var(--orange)}
+.phone-glow{
+  position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(214,35,0,.3) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* ══════════════════════════════════════════
+   LOCATOR
+══════════════════════════════════════════ */
+.locator{background:var(--ink);padding:96px 0}
+.locator-inner{
+  display:grid;grid-template-columns:340px 1fr;gap:40px;align-items:start;
+}
+.locator-sidebar{}
+.location-search{
+  display:flex;gap:0;margin:24px 0;
+}
+.location-input{
+  flex:1;background:var(--card-bg);border:1px solid var(--border);
+  color:var(--cream);font-family:Georgia,serif;font-size:13px;
+  padding:12px 16px;outline:none;
+  transition:border-color .2s;
+}
+.location-input::placeholder{color:var(--muted)}
+.location-input:focus{border-color:var(--red)}
+.location-search-btn{
+  background:var(--red);color:var(--cream);padding:12px 18px;font-size:16px;
+}
+.location-cards{display:flex;flex-direction:column;gap:12px}
+.loc-card{
+  background:var(--card-bg);border:1px solid var(--border);
+  padding:16px;cursor:pointer;transition:border-color .2s;
+}
+.loc-card:hover,.loc-card.active{border-color:var(--red)}
+.loc-name{font-family:'Arial Black','Arial Bold',sans-serif;font-size:13px;font-weight:900;text-transform:uppercase;margin-bottom:4px}
+.loc-addr{font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.4}
+.loc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.loc-tag{
+  font-family:monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;
+  padding:2px 8px;border:1px solid;
+}
+.loc-tag.open{border-color:rgba(15,118,110,.6);color:#0F766E;background:rgba(15,118,110,.08)}
+.loc-tag.drive{border-color:rgba(245,135,31,.4);color:var(--orange);background:rgba(245,135,31,.08)}
+.loc-tag.delivery{border-color:rgba(214,35,0,.4);color:var(--red);background:rgba(214,35,0,.08)}
+.loc-card-actions{display:flex;gap:8px}
+.loc-action{
+  flex:1;text-align:center;
+  font-family:monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:6px;border:1px solid var(--border);color:var(--muted);
+  transition:all .15s;
+}
+.loc-action:hover{border-color:var(--cream);color:var(--cream)}
+.map-area{
+  background:var(--card-bg);border:1px solid var(--border);
+  aspect-ratio:4/3;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.map-bg{
+  position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(245,240,232,.04) 39px, rgba(245,240,232,.04) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(245,240,232,.04) 39px, rgba(245,240,232,.04) 40px),
+    #161616;
+}
+.map-pins{position:absolute;inset:0}
+.map-pin{
+  position:absolute;
+  transform:translate(-50%,-100%);
+  cursor:pointer;
+}
+.pin-dot{
+  width:20px;height:20px;border-radius:50%;
+  background:var(--red);border:2px solid var(--cream);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;
+  box-shadow:0 2px 12px rgba(214,35,0,.6);
+  transition:transform .2s;
+}
+.map-pin:hover .pin-dot{transform:scale(1.3)}
+.pin-stem{
+  width:2px;height:10px;background:var(--red);margin:0 auto;
+}
+.map-credit{
+  position:absolute;bottom:12px;right:12px;
+  font-family:monospace;font-size:9px;color:var(--muted);letter-spacing:1px;
+}
+.map-find-btn{
+  position:absolute;top:16px;right:16px;
+  background:var(--black);border:1px solid var(--border);
+  color:var(--cream);font-family:monospace;font-size:9px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;padding:8px 14px;
+  cursor:pointer;transition:border-color .2s;
+}
+.map-find-btn:hover{border-color:var(--red)}
+
+/* ══════════════════════════════════════════
+   COMMUNITY — UGC
+══════════════════════════════════════════ */
+.community{background:var(--black);padding:96px 0}
+.community-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;
+}
+.ugc-big-grid{
+  display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  gap:8px;aspect-ratio:1;
+}
+.ugc-big-cell{
+  position:relative;overflow:hidden;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.ugc-big-cell:first-child{
+  grid-column:1;grid-row:1/3;
+}
+.ugc-big-cell::before{content:'';position:absolute;inset:0;background:var(--bg);transition:opacity .3s}
+.ugc-big-cell:hover::before{opacity:.6}
+.ugc-big-cell .ugc-em{font-size:80px;position:relative;z-index:1}
+.ugc-big-cell:first-child .ugc-em{font-size:120px}
+.ugc-action{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(0deg,rgba(13,13,13,.9) 0%,transparent 100%);
+  padding:24px 16px 14px;font-family:monospace;font-size:10px;letter-spacing:1px;
+  color:var(--cream);opacity:0;transition:opacity .3s;
+}
+.ugc-big-cell:hover .ugc-action{opacity:1}
+.community-text .section-title{margin-bottom:20px}
+.community-desc{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:32px;max-width:400px}
+.hashtag{
+  display:inline-block;
+  font-family:'Arial Black','Arial Bold',sans-serif;font-size:28px;font-weight:900;
+  color:var(--orange);margin-bottom:24px;letter-spacing:-1px;
+}
+.community-stats{display:flex;gap:32px;margin-bottom:32px;flex-wrap:wrap}
+.cs-val{font-family:'Arial Black','Arial Bold',sans-serif;font-size:32px;font-weight:900;color:var(--cream);line-height:1}
+.cs-label{font-family:monospace;font-size:9px;letter-spacing:1px;color:var(--muted);margin-top:4px}
+
+/* ══════════════════════════════════════════
+   BRAND STORY
+══════════════════════════════════════════ */
+.story{
+  background:linear-gradient(160deg,#1A0500 0%,#0d0d0d 60%,var(--ink) 100%);
+  padding:96px 0;border-top:1px solid var(--border);
+}
+.story-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;
+}
+.story-year{
+  font-family:'Arial Black','Arial Bold',sans-serif;
+  font-size:120px;font-weight:900;line-height:.85;
+  color:transparent;-webkit-text-stroke:1px rgba(214,35,0,.4);
+  letter-spacing:-6px;margin-bottom:24px;
+}
+.story-body p{font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:16px}
+.story-body p strong{color:var(--cream);font-style:normal}
+.certs{
+  display:flex;flex-direction:column;gap:16px;margin-top:40px;
+}
+.cert-row{
+  display:flex;align-items:center;gap:16px;
+  border-bottom:1px solid var(--border);padding-bottom:16px;
+}
+.cert-icon{font-size:28px;flex-shrink:0}
+.cert-title{font-family:'Arial Black','Arial Bold',sans-serif;font-size:12px;font-weight:900;text-transform:uppercase;margin-bottom:3px}
+.cert-desc{font-size:11px;color:var(--muted);line-height:1.4}
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{
+  display:flex;gap:24px;
+  padding-bottom:32px;
+  position:relative;
+}
+.tl-item:not(:last-child)::before{
+  content:'';
+  position:absolute;left:20px;top:40px;bottom:0;
+  width:1px;background:var(--border);
+}
+.tl-dot{
+  width:40px;height:40px;flex-shrink:0;
+  background:rgba(214,35,0,.15);border:1px solid rgba(214,35,0,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:monospace;font-size:9px;font-weight:700;color:var(--red);letter-spacing:1px;
+  text-align:center;line-height:1.2;
+  position:relative;z-index:1;
+}
+.tl-year{font-family:'Arial Black','Arial Bold',sans-serif;font-size:24px;font-weight:900;color:var(--orange);margin-bottom:4px;line-height:1}
+.tl-text{font-size:13px;color:var(--muted);line-height:1.5;padding-top:4px}
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+.footer{background:var(--ink);border-top:1px solid var(--border);padding:64px 0 0}
+.footer-top{
+  display:grid;grid-template-columns:200px 1fr;gap:64px;margin-bottom:56px;
+}
+.footer-brand{}
+.footer-logo{
+  font-family:'Arial Black','Arial Bold',sans-serif;font-size:20px;font-weight:900;
+  text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.footer-tagline{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:24px}
+.footer-social{display:flex;gap:8px}
+.social-icon{
+  width:36px;height:36px;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all .15s;
+}
+.social-icon:hover{border-color:var(--orange);color:var(--orange)}
+.footer-nav-cols{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:32px;
+}
+.footer-col-title{
+  font-family:monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:16px;
+}
+.footer-col ul{display:flex;flex-direction:column;gap:10px}
+.footer-col a{
+  font-size:13px;color:rgba(245,240,232,0.5);transition:color .15s;
+}
+.footer-col a:hover{color:var(--cream)}
+.newsletter{
+  background:var(--card-bg);border:1px solid var(--border);
+  padding:28px 32px;margin-bottom:40px;
+  display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;
+}
+.nl-text{}
+.nl-eyebrow{font-family:monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.nl-title{font-family:'Arial Black','Arial Bold',sans-serif;font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:-.5px}
+.nl-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.nl-form{display:flex;gap:0;min-width:320px}
+.nl-input{
+  flex:1;background:rgba(245,240,232,.05);border:1px solid var(--border);
+  color:var(--cream);font-family:Georgia,serif;font-size:13px;
+  padding:12px 16px;outline:none;transition:border-color .2s;
+}
+.nl-input::placeholder{color:var(--muted)}
+.nl-input:focus{border-color:var(--orange)}
+.nl-submit{
+  background:var(--orange);color:var(--black);
+  font-family:monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:12px 20px;transition:background .15s;
+}
+.nl-submit:hover{background:var(--orange-light)}
+.footer-bottom{
+  border-top:1px solid var(--border);
+  padding:20px 0;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer-legal{display:flex;gap:20px;flex-wrap:wrap}
+.footer-legal a{font-family:monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(245,240,232,.3);transition:color .15s}
+.footer-legal a:hover{color:var(--muted)}
+.footer-copy{font-family:monospace;font-size:9px;letter-spacing:1px;color:rgba(245,240,232,.25)}
+.lang-select{
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);font-family:monospace;font-size:9px;letter-spacing:1px;
+  padding:4px 10px;cursor:pointer;
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:900px){
+  .hero-content{grid-template-columns:1fr;gap:40px}
+  .hero-visual{display:none}
+  .app-inner{grid-template-columns:1fr}
+  .phone-mockup{display:none}
+  .locator-inner{grid-template-columns:1fr}
+  .map-area{aspect-ratio:16/9}
+  .community-inner{grid-template-columns:1fr}
+  .story-inner{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr;gap:40px}
+  .footer-nav-cols{grid-template-columns:repeat(2,1fr)}
+  .newsletter{grid-template-columns:1fr}
+  .nl-form{flex-direction:column}
+  .nav-links{display:none}
+  .nav-ham{display:flex}
+  .deals-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .container{padding:0 20px}
+  .section{padding:64px 0}
+  .hero-h1{font-size:52px}
+  .ugc-grid{grid-template-columns:repeat(3,1fr)}
+  .deals-grid{grid-template-columns:1fr}
+  .footer-nav-cols{grid-template-columns:1fr 1fr}
+  .app-deal-card{grid-template-columns:1fr}
+  .trust-top{flex-direction:column;gap:24px}
+  .trust-divider{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- DEAL RIBBON -->
+<div class="deal-ribbon" aria-label="Current promotions">
+  <div class="deal-ribbon-track">
+    🔥 2-for-1 Whoppers this week only<span class="ribbon-sep">|</span>
+    App exclusive: Free fries with any order<span class="ribbon-sep">|</span>
+    🍔 New Steakhouse Stack — order now<span class="ribbon-sep">|</span>
+    Earn 2× Crown Points every Tuesday<span class="ribbon-sep">|</span>
+    🌶️ Fiery Chicken is back — limited time<span class="ribbon-sep">|</span>
+    Download the app for exclusive deals<span class="ribbon-sep">|</span>
+    🔥 2-for-1 Whoppers this week only<span class="ribbon-sep">|</span>
+    App exclusive: Free fries with any order<span class="ribbon-sep">|</span>
+    🍔 New Steakhouse Stack — order now<span class="ribbon-sep">|</span>
+    Earn 2× Crown Points every Tuesday<span class="ribbon-sep">|</span>
+    🌶️ Fiery Chicken is back — limited time<span class="ribbon-sep">|</span>
+    Download the app for exclusive deals<span class="ribbon-sep">|</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">
+      <span class="logo-flame">🔥</span>
+      <span>Burger King</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#menu-section">Menu</a></li>
+      <li><a href="#deals">Deals</a></li>
+      <li><a href="#locator">Find Us</a></li>
+      <li><a href="#app-section">App</a></li>
+      <li><a href="#story">Our Story</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="cart-btn" id="cartBtn" aria-label="Cart">
+        🛒
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <a href="#deals" class="nav-order-btn btn">Order Now</a>
+      <button class="nav-ham" id="navHam" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#menu-section" onclick="closeMobile()">Menu</a>
+  <a href="#deals" onclick="closeMobile()">Deals</a>
+  <a href="#locator" onclick="closeMobile()">Find Us</a>
+  <a href="#app-section" onclick="closeMobile()">App</a>
+  <a href="#story" onclick="closeMobile()">Our Story</a>
+  <a href="#deals" class="btn btn-primary" onclick="closeMobile()">Order Now →</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="flame-particles" id="flameParticles"></div>
+  <div class="hero-content container">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Flame-Grilled Since 1954</div>
+      <h1 class="hero-h1">
+        HAVE<br>
+        <span class="line2">IT YOUR</span><br>
+        <span class="line3">WAY®</span>
+      </h1>
+      <p class="hero-sub">
+        Real flame. Real beef. Real flavour. Every Whopper is grilled over an open flame — because some things are worth doing right.
+      </p>
+      <div class="hero-cta">
+        <a href="#menu-section" class="btn btn-primary">Order Now →</a>
+        <a href="#locator" class="btn btn-secondary">Find a Restaurant</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hstat-val">18,000+</div>
+          <div class="hstat-label">Locations</div>
+        </div>
+        <div>
+          <div class="hstat-val">70+</div>
+          <div class="hstat-label">Countries</div>
+        </div>
+        <div>
+          <div class="hstat-val">1954</div>
+          <div class="hstat-label">Founded</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="burger-showcase">
+        <div class="burger-glow"></div>
+        <div class="burger-emoji">🍔</div>
+        <div class="hero-badge">Flame<br>Grilled<br>Always</div>
+        <div class="hero-price-tag">
+          <div class="price-from">from</div>
+          <div class="price-val">$5.99</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUST / SOCIAL PROOF ══ -->
+<section class="trust" id="trust">
+  <div class="container">
+    <div class="trust-top">
+      <div class="trust-rating">
+        <div class="stars">★★★★★</div>
+        <div class="rating-val">4.7</div>
+        <div class="rating-count">Based on 2.4 million reviews</div>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-claim">
+        <div class="claim-badge">#1 Flame-Grilled Burger®</div>
+        <p class="claim-text">
+          The only major quick-service burger chain that flame-grills every patty. No shortcuts. No shortcuts to flavour.
+        </p>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-counts">
+        <div>
+          <div class="tc-val">40M+</div>
+          <div class="tc-label">Daily Guests</div>
+        </div>
+        <div>
+          <div class="tc-val">12M+</div>
+          <div class="tc-label">App Members</div>
+        </div>
+        <div>
+          <div class="tc-val">100%</div>
+          <div class="tc-label">Real Beef</div>
+        </div>
+      </div>
+    </div>
+    <div class="press-strip">
+      <span class="press-label">As Seen In</span>
+      <div class="press-logos">
+        <span class="press-logo">Forbes</span>
+        <span class="press-logo">Food & Wine</span>
+        <span class="press-logo">TIME</span>
+        <span class="press-logo">Bon Appétit</span>
+        <span class="press-logo">The Guardian</span>
+        <span class="press-logo">Bloomberg</span>
+      </div>
+    </div>
+    <div class="ugc-grid">
+      <div class="ugc-cell" style="--bg:linear-gradient(135deg,#3D0000,#1A0000)"><span>🍔</span><div class="ugc-overlay">@kris.eats<br>📍 NYC</div></div>
+      <div class="ugc-cell" style="--bg:linear-gradient(135deg,#3D1400,#1A0800)"><span>🍟</span><div class="ugc-overlay">@snackqueen<br>📍 LA</div></div>
+      <div class="ugc-cell" style="--bg:linear-gradient(135deg,#1A1A00,#0D0D00)"><span>🧀</span><div class="ugc-overlay">@cheesy.b<br>📍 Chicago</div></div>
+      <div class="ugc-cell" style="--bg:linear-gradient(135deg,#3D1A00,#1A0D00)"><span>🌶️</span><div class="ugc-overlay">@hot_takes<br>📍 Dallas</div></div>
+      <div class="ugc-cell" style="--bg:linear-gradient(135deg,#0D1A0D,#060D06)"><span>🥗</span><div class="ugc-overlay">@plantbased_<br>📍 London</div></div>
+      <div class="ugc-cell" style="--bg:linear-gradient(135deg,#1A0D1A,#0D0018)"><span>🥤</span><div class="ugc-overlay">@thirsty99<br>📍 Miami</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DEALS — THE HOT ZONE ══ -->
+<section class="deals" id="deals">
+  <div class="container">
+    <div class="deals-header">
+      <div>
+        <span class="section-label">03 — The Hot Zone</span>
+        <h2 class="section-title">Today's<br><span style="color:var(--orange)">Deals</span></h2>
+      </div>
+      <div class="today-strip">
+        <span class="dot"></span>
+        Today Only — Ends at midnight
+      </div>
+    </div>
+
+    <div class="deals-grid">
+      <div class="deal-card">
+        <div class="deal-card-img" style="--grad:linear-gradient(135deg,#3D0000 0%,#8B1A00 100%)">
+          <span class="deal-emoji">🍔</span>
+          <div class="deal-flag">🔥 Best Seller</div>
+          <div class="deal-countdown" id="cd1">--:--:--</div>
+        </div>
+        <div class="deal-body">
+          <div class="deal-name">2-for-1 Whopper®</div>
+          <div class="deal-desc">Two flame-grilled Whopper patties. Share one or save one for later — no judgement.</div>
+          <div class="deal-price-row">
+            <div>
+              <div class="deal-was">Was $12.98</div>
+              <div class="deal-now">$6.99</div>
+            </div>
+            <button class="deal-add-btn" onclick="addToCart('2-for-1 Whopper®','$6.99')">Add →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="deal-card">
+        <div class="deal-card-img" style="--grad:linear-gradient(135deg,#3D1A00 0%,#8B3D00 100%)">
+          <span class="deal-emoji">🍗</span>
+          <div class="deal-flag">🌶️ Spicy</div>
+          <div class="deal-countdown" id="cd2">--:--:--</div>
+        </div>
+        <div class="deal-body">
+          <div class="deal-name">Fiery Chicken Meal</div>
+          <div class="deal-desc">Crispy fiery chicken sandwich + large fries + drink. Hot enough to wake you up.</div>
+          <div class="deal-price-row">
+            <div>
+              <div class="deal-was">Was $13.49</div>
+              <div class="deal-now">$9.49</div>
+            </div>
+            <button class="deal-add-btn" onclick="addToCart('Fiery Chicken Meal','$9.49')">Add →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="deal-card">
+        <div class="deal-card-img" style="--grad:linear-gradient(135deg,#1A1A00 0%,#3D3D00 100%)">
+          <span class="deal-emoji">👑</span>
+          <div class="deal-flag">👑 King Deal</div>
+          <div class="deal-countdown" id="cd3">--:--:--</div>
+        </div>
+        <div class="deal-body">
+          <div class="deal-name">King Family Bundle</div>
+          <div class="deal-desc">4 Whoppers, 4 large fries, 4 drinks. Feed the whole kingdom.</div>
+          <div class="deal-price-row">
+            <div>
+              <div class="deal-was">Was $47.96</div>
+              <div class="deal-now">$32.99</div>
+            </div>
+            <button class="deal-add-btn" onclick="addToCart('King Family Bundle','$32.99')">Add →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-deal-card">
+      <div>
+        <div class="app-deal-eyebrow">📱 App Exclusive</div>
+        <div class="app-deal-title">Free Large Fries<br>with any order</div>
+        <div class="app-deal-sub">Download the BK app, place your first order, and get a free large fries added automatically. No code needed.</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="#app-section" class="btn btn-orange">Download App →</a>
+          <a href="#app-section" class="btn btn-secondary">Learn More</a>
+        </div>
+      </div>
+      <div>
+        <div class="qr-mock" id="qrMock"></div>
+        <div style="font-family:monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;letter-spacing:1px">SCAN TO DOWNLOAD</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ MENU — THE FLAME MENU ══ -->
+<section class="menu-section" id="menu-section">
+  <div class="container">
+    <span class="section-label">04 — The Flame Menu</span>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:36px">
+      <h2 class="section-title">Our<br><span style="color:var(--orange)">Menu</span></h2>
+      <div class="diet-filters">
+        <button class="diet-btn active" data-filter="all">All</button>
+        <button class="diet-btn" data-filter="veggie">🌱 Veggie</button>
+        <button class="diet-btn" data-filter="spicy">🌶️ Spicy</button>
+        <button class="diet-btn" data-filter="lowcal">⚡ Low Cal</button>
+      </div>
+    </div>
+    <div class="menu-controls">
+      <div class="menu-tabs">
+        <button class="menu-tab active" data-tab="burgers">🍔 Burgers</button>
+        <button class="menu-tab" data-tab="chicken">🍗 Chicken</button>
+        <button class="menu-tab" data-tab="sides">🍟 Sides</button>
+        <button class="menu-tab" data-tab="drinks">🥤 Drinks</button>
+        <button class="menu-tab" data-tab="desserts">🍦 Desserts</button>
+      </div>
+    </div>
+    <div class="menu-grid" id="menuGrid"></div>
+  </div>
+</section>
+
+<!-- ══ APP — THE ROYAL APP ══ -->
+<section class="app-section" id="app-section">
+  <div class="container">
+    <div class="app-inner">
+      <div>
+        <span class="section-label">05 — The Royal App</span>
+        <h2 class="section-title">The BK<br><span style="color:var(--orange)">App</span></h2>
+        <div class="app-benefits">
+          <div class="benefit-row">
+            <div class="benefit-icon">🎯</div>
+            <div>
+              <div class="benefit-title">Exclusive Deals Daily</div>
+              <div class="benefit-desc">App members get deals up to 50% off — never available anywhere else.</div>
+            </div>
+          </div>
+          <div class="benefit-row">
+            <div class="benefit-icon">👑</div>
+            <div>
+              <div class="benefit-title">Earn Crown Points</div>
+              <div class="benefit-desc">Every purchase earns points. Redeem for free food, upgrades, and more.</div>
+            </div>
+          </div>
+          <div class="benefit-row">
+            <div class="benefit-icon">📍</div>
+            <div>
+              <div class="benefit-title">Order Ahead & Track</div>
+              <div class="benefit-desc">Skip the queue. Order from your phone and pick up when it's ready.</div>
+            </div>
+          </div>
+          <div class="benefit-row">
+            <div class="benefit-icon">🚀</div>
+            <div>
+              <div class="benefit-title">Fast Delivery</div>
+              <div class="benefit-desc">Get your flame-grilled favourites delivered in under 30 minutes.</div>
+            </div>
+          </div>
+        </div>
+        <div class="app-ctas">
+          <a href="#" class="store-btn">
+            <span class="store-icon">🍎</span>
+            <div class="store-text">
+              <div class="store-sub">Download on the</div>
+              <div class="store-name">App Store</div>
+            </div>
+          </a>
+          <a href="#" class="store-btn">
+            <span class="store-icon">▶</span>
+            <div class="store-text">
+              <div class="store-sub">Get it on</div>
+              <div class="store-name">Google Play</div>
+            </div>
+          </a>
+        </div>
+        <div style="font-family:monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Loyalty Tiers</div>
+        <div class="loyalty-tiers">
+          <div class="tier">
+            <div class="tier-icon">🥉</div>
+            <div class="tier-name">Member</div>
+          </div>
+          <div class="tier">
+            <div class="tier-icon">🥈</div>
+            <div class="tier-name">Royal</div>
+          </div>
+          <div class="tier highlight">
+            <div class="tier-icon">👑</div>
+            <div class="tier-name">King</div>
+          </div>
+          <div class="tier">
+            <div class="tier-icon">💎</div>
+            <div class="tier-name">Legend</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-mockup">
+        <div class="phone-frame">
+          <div class="phone-notch">
+            <div style="width:50px;height:8px;background:#222;border-radius:4px"></div>
+          </div>
+          <div class="phone-screen">
+            <div class="app-status">
+              <span>9:41</span>
+              <span>●●● 100%</span>
+            </div>
+            <div class="app-nav-bar">🔥 BURGER KING</div>
+            <div style="font-family:monospace;font-size:8px;letter-spacing:1px;color:var(--orange);margin-bottom:10px">👑 2,400 Crown Points</div>
+            <div class="app-card">
+              <div class="app-card-img">🍔</div>
+              <div class="app-card-name">Whopper® Meal</div>
+              <div class="app-card-row">
+                <span class="app-card-pts">+120 pts</span>
+                <span class="app-card-price">$8.99</span>
+              </div>
+            </div>
+            <div class="app-card">
+              <div class="app-card-img" style="background:linear-gradient(135deg,#3D1A00,#1A0D00)">🍗</div>
+              <div class="app-card-name">Fiery Chicken</div>
+              <div class="app-card-row">
+                <span class="app-card-pts">+90 pts</span>
+                <span class="app-card-price">$7.49</span>
+              </div>
+            </div>
+            <div style="background:var(--orange);color:var(--black);padding:10px;text-align:center;font-family:'Arial Black','Arial Bold',sans-serif;font-size:11px;font-weight:900;margin-top:8px">
+              🎁 FREE FRIES TODAY
+            </div>
+          </div>
+        </div>
+        <div class="phone-glow"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LOCATOR — THE KINGDOM MAP ══ -->
+<section class="locator" id="locator">
+  <div class="container">
+    <span class="section-label">06 — The Kingdom Map</span>
+    <h2 class="section-title" style="margin-bottom:40px">Find a<br><span style="color:var(--orange)">Restaurant</span></h2>
+    <div class="locator-inner">
+      <div class="locator-sidebar">
+        <div class="location-search">
+          <input class="location-input" type="text" placeholder="City, postcode or address…" id="locInput"/>
+          <button class="location-search-btn" onclick="searchLocation()">📍</button>
+        </div>
+        <div class="location-cards" id="locCards">
+          <div class="loc-card active">
+            <div class="loc-name">BK Midtown — 5th Avenue</div>
+            <div class="loc-addr">452 5th Ave, New York, NY 10018</div>
+            <div class="loc-tags">
+              <span class="loc-tag open">Open · Closes 11pm</span>
+              <span class="loc-tag drive">Drive-Thru</span>
+              <span class="loc-tag delivery">Delivery</span>
+            </div>
+            <div style="font-family:monospace;font-size:9px;color:var(--muted);margin-bottom:10px;letter-spacing:1px">⏱ Current wait: ~5 min</div>
+            <div class="loc-card-actions">
+              <a class="loc-action" href="#">📞 Call</a>
+              <a class="loc-action" href="#">🗺 Directions</a>
+              <a class="loc-action" href="#menu-section">🛒 Order</a>
+            </div>
+          </div>
+          <div class="loc-card">
+            <div class="loc-name">BK Times Square</div>
+            <div class="loc-addr">700 8th Ave, New York, NY 10036</div>
+            <div class="loc-tags">
+              <span class="loc-tag open">Open · Closes 2am</span>
+              <span class="loc-tag delivery">Delivery</span>
+            </div>
+            <div style="font-family:monospace;font-size:9px;color:var(--muted);margin-bottom:10px;letter-spacing:1px">⏱ Current wait: ~8 min</div>
+            <div class="loc-card-actions">
+              <a class="loc-action" href="#">📞 Call</a>
+              <a class="loc-action" href="#">🗺 Directions</a>
+              <a class="loc-action" href="#menu-section">🛒 Order</a>
+            </div>
+          </div>
+          <div class="loc-card">
+            <div class="loc-name">BK Brooklyn Bridge</div>
+            <div class="loc-addr">144 Fulton St, Brooklyn, NY 11201</div>
+            <div class="loc-tags">
+              <span class="loc-tag open">Open · Closes 10pm</span>
+              <span class="loc-tag drive">Drive-Thru</span>
+            </div>
+            <div style="font-family:monospace;font-size:9px;color:var(--muted);margin-bottom:10px;letter-spacing:1px">⏱ Current wait: ~3 min</div>
+            <div class="loc-card-actions">
+              <a class="loc-action" href="#">📞 Call</a>
+              <a class="loc-action" href="#">🗺 Directions</a>
+              <a class="loc-action" href="#menu-section">🛒 Order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="map-area">
+        <div class="map-bg"></div>
+        <div class="map-pins">
+          <div class="map-pin" style="left:44%;top:38%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+          <div class="map-pin" style="left:55%;top:28%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+          <div class="map-pin" style="left:62%;top:58%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+          <div class="map-pin" style="left:30%;top:52%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+          <div class="map-pin" style="left:70%;top:42%"><div class="pin-dot">BK</div><div class="pin-stem"></div></div>
+        </div>
+        <button class="map-find-btn" onclick="useMyLocation()">📍 Use My Location</button>
+        <div class="map-credit">Map data © BurgerKing 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COMMUNITY — THE COURT FEED ══ -->
+<section class="community" id="community">
+  <div class="container">
+    <div class="community-inner">
+      <div class="ugc-big-grid">
+        <div class="ugc-big-cell" style="--bg:linear-gradient(160deg,#2D0000,#0D0000)">
+          <span class="ugc-em">🍔</span>
+          <div class="ugc-action">@whopper.nation · 12.4k likes</div>
+        </div>
+        <div class="ugc-big-cell" style="--bg:linear-gradient(160deg,#2D1400,#0D0600)">
+          <span class="ugc-em">🍟</span>
+          <div class="ugc-action">@fries4ever · 8.1k likes</div>
+        </div>
+        <div class="ugc-big-cell" style="--bg:linear-gradient(160deg,#1A1A00,#080800)">
+          <span class="ugc-em">🌶️</span>
+          <div class="ugc-action">@spicylife · 21k likes</div>
+        </div>
+      </div>
+      <div class="community-text">
+        <span class="section-label">07 — The Court Feed</span>
+        <h2 class="section-title">Join the<br><span style="color:var(--orange)">Kingdom</span></h2>
+        <p class="community-desc">
+          Tag your meals, share your flame, and become part of the BK community. Every post feeds the algorithm — and the king's appetite.
+        </p>
+        <div class="hashtag">#BurgerKing</div>
+        <div class="community-stats">
+          <div>
+            <div class="cs-val">4.2M</div>
+            <div class="cs-label">Posts</div>
+          </div>
+          <div>
+            <div class="cs-val">8.7M</div>
+            <div class="cs-label">Followers</div>
+          </div>
+          <div>
+            <div class="cs-val">120M</div>
+            <div class="cs-label">Monthly Views</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="#" class="btn btn-primary">Share Your Meal 📸</a>
+          <a href="#" class="btn btn-secondary">Fan of the Month</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BRAND STORY ══ -->
+<section class="story" id="story">
+  <div class="container">
+    <div class="story-inner">
+      <div>
+        <span class="section-label">08 — The Flame Behind the Brand</span>
+        <div class="story-year">1954</div>
+        <div class="story-body">
+          <p>In <strong>Miami, 1954</strong>, two brothers lit a flame that would circle the globe. They didn't have algorithms or focus groups — they had an open broiler and a belief that <strong>real fire makes real flavour</strong>.</p>
+          <p>Seventy years later, that flame is still burning. Every Whopper® is still grilled the same way — over a <strong>real open flame</strong>, never a flat-top, never a shortcut.</p>
+          <p>We use <strong>100% pure beef</strong> with no fillers, no artificial preservatives, and no apologies. Our packaging is moving to <strong>100% recyclable materials</strong> by 2026, and we've committed to <strong>net-zero operations</strong> by 2050.</p>
+        </div>
+        <div class="certs">
+          <div class="cert-row">
+            <div class="cert-icon">🔥</div>
+            <div>
+              <div class="cert-title">Flame-Grilled Always</div>
+              <div class="cert-desc">Every patty cooked over real open fire. Not a flat-top. Not steam. Fire.</div>
+            </div>
+          </div>
+          <div class="cert-row">
+            <div class="cert-icon">🐄</div>
+            <div>
+              <div class="cert-title">100% Real Beef</div>
+              <div class="cert-desc">No fillers, no additives, no artificial preservatives in our beef patties.</div>
+            </div>
+          </div>
+          <div class="cert-row">
+            <div class="cert-icon">🌍</div>
+            <div>
+              <div class="cert-title">Sustainability Commitment</div>
+              <div class="cert-desc">100% recyclable guest packaging by 2025. Net-zero operations target: 2050.</div>
+            </div>
+          </div>
+          <div class="cert-row">
+            <div class="cert-icon">❤️</div>
+            <div>
+              <div class="cert-title">McLamore Foundation</div>
+              <div class="cert-desc">$50M+ invested in education scholarships for restaurant employees and their families.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:24px">Brand Timeline</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot">1954</div>
+            <div>
+              <div class="tl-year">1954</div>
+              <div class="tl-text">Founded in Miami by James McLamore and David Edgerton. The first Insta-Broiler changes fast food forever.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">1957</div>
+            <div>
+              <div class="tl-year">1957</div>
+              <div class="tl-text">The Whopper® is born. 37 cents. A 1/4-lb flame-grilled patty. The world would never be the same.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">1974</div>
+            <div>
+              <div class="tl-year">1974</div>
+              <div class="tl-text">"Have It Your Way®" — the campaign that redefined fast food customisation and consumer choice.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">2019</div>
+            <div>
+              <div class="tl-year">2019</div>
+              <div class="tl-text">The Impossible Whopper® launches — plant-based, flame-grilled, and shockingly real.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">2026</div>
+            <div>
+              <div class="tl-year">2026</div>
+              <div class="tl-text">18,000+ restaurants. 70+ countries. 40M+ guests daily. The flame keeps burning.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer" id="footer">
+  <div class="container">
+    <div class="newsletter">
+      <div class="nl-text">
+        <div class="nl-eyebrow">📬 Join the Kingdom</div>
+        <div class="nl-title">Get Deals Before Anyone Else</div>
+        <div class="nl-sub">Newsletter subscribers get first access to deals + a free item on sign-up.</div>
+      </div>
+      <div>
+        <div class="nl-form">
+          <input class="nl-input" type="email" placeholder="your@email.com" id="nlEmail"/>
+          <button class="nl-submit" onclick="subscribeNewsletter()">Subscribe →</button>
+        </div>
+        <div style="font-family:monospace;font-size:9px;color:var(--muted);margin-top:8px;letter-spacing:1px">No spam. Unsubscribe anytime. One free item on first order.</div>
+      </div>
+    </div>
+
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">🔥 Burger King®</div>
+        <p class="footer-tagline">Flame-grilled since 1954. Real beef. Real fire. Real flavour.</p>
+        <div class="footer-social">
+          <a href="#" class="social-icon" aria-label="Instagram">📷</a>
+          <a href="#" class="social-icon" aria-label="TikTok">🎵</a>
+          <a href="#" class="social-icon" aria-label="Twitter">𝕏</a>
+          <a href="#" class="social-icon" aria-label="Facebook">𝑓</a>
+          <a href="#" class="social-icon" aria-label="YouTube">▶</a>
+        </div>
+      </div>
+      <div class="footer-nav-cols">
+        <div class="footer-col">
+          <div class="footer-col-title">Menu</div>
+          <ul>
+            <li><a href="#menu-section">Burgers</a></li>
+            <li><a href="#menu-section">Chicken</a></li>
+            <li><a href="#menu-section">Sides</a></li>
+            <li><a href="#menu-section">Drinks</a></li>
+            <li><a href="#menu-section">Desserts</a></li>
+            <li><a href="#menu-section">Veggie Options</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Company</div>
+          <ul>
+            <li><a href="#story">Our Story</a></li>
+            <li><a href="#">Franchise</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Investor Relations</a></li>
+            <li><a href="#">Press Room</a></li>
+            <li><a href="#">Sustainability</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Help</div>
+          <ul>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">FAQs</a></li>
+            <li><a href="#">Allergen Info</a></li>
+            <li><a href="#">Nutritional Info</a></li>
+            <li><a href="#">Gift Cards</a></li>
+            <li><a href="#">Accessibility</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Order</div>
+          <ul>
+            <li><a href="#app-section">Download App</a></li>
+            <li><a href="#deals">Today's Deals</a></li>
+            <li><a href="#locator">Find a Restaurant</a></li>
+            <li><a href="#">Delivery</a></li>
+            <li><a href="#">Catering</a></li>
+            <li><a href="#">BK Rewards</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-legal">
+        <a href="#">Terms of Use</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Cookie Settings</a>
+        <a href="#">Allergen Info</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Do Not Sell My Info</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <select class="lang-select" aria-label="Language">
+          <option>🌍 English</option>
+          <option>🇫🇷 Français</option>
+          <option>🇩🇪 Deutsch</option>
+          <option>🇪🇸 Español</option>
+        </select>
+        <span class="footer-copy">© 2026 Burger King Corporation</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- CART TOAST -->
+<div class="cart-toast" id="cartToast">
+  <span class="toast-icon">🛒</span>
+  <div>
+    <div class="toast-item" id="toastItem">Item</div>
+    <div class="toast-msg">Added to cart · <span id="toastTotal">$0.00</span></div>
+  </div>
+</div>
+
+<script>
+/* ─── DATA ─── */
+const menuItems = [
+  // Burgers
+  {tab:'burgers',name:'Whopper®',desc:'A quarter-pound flame-grilled beef patty, fresh tomato, crisp lettuce.',price:'$5.99',cal:'657 cal',emoji:'🍔',flag:'bestseller',pair:'Add large fries?',tags:['all']},
+  {tab:'burgers',name:'Double Whopper®',desc:'Two flame-grilled patties, double the greatness.',price:'$7.49',cal:'902 cal',emoji:'🍔',flag:'fan',pair:'Try a milkshake?',tags:['all']},
+  {tab:'burgers',name:'Steakhouse Stack',desc:'Aged cheddar, crispy onions, smoky BK sauce. The new king.',price:'$8.99',cal:'820 cal',emoji:'🥩',flag:'',pair:'Add onion rings?',tags:['all']},
+  {tab:'burgers',name:'Impossible™ Whopper',desc:'100% plant-based patty, flame-grilled to perfection.',price:'$6.99',cal:'630 cal',emoji:'🌱',flag:'',pair:'Try plant-based nuggets?',tags:['all','veggie']},
+  {tab:'burgers',name:'Bacon Cheeseburger',desc:'Crispy bacon, melted American cheese, pickles, ketchup.',price:'$4.99',cal:'540 cal',emoji:'🥓',flag:'',pair:'Add large fries?',tags:['all']},
+  {tab:'burgers',name:'BK Veggie Burger',desc:'Garden-fresh vegetable patty with all the trimmings.',price:'$5.49',cal:'390 cal',emoji:'🥬',flag:'',pair:'Add a side salad?',tags:['all','veggie','lowcal']},
+  // Chicken
+  {tab:'chicken',name:'Crispy Chicken Sandwich',desc:'Hand-breaded crispy chicken breast on a brioche bun.',price:'$6.49',cal:'660 cal',emoji:'🍗',flag:'bestseller',pair:'Add coleslaw?',tags:['all']},
+  {tab:'chicken',name:'Fiery Chicken Sandwich',desc:'Double-breaded with ghost pepper coating. Not for the faint-hearted.',price:'$7.49',cal:'740 cal',emoji:'🌶️',flag:'fan',pair:'Cool down with a milkshake?',tags:['all','spicy']},
+  {tab:'chicken',name:'Grilled Chicken Wrap',desc:'Flame-grilled chicken, mixed leaves, BK chipotle sauce.',price:'$6.99',cal:'430 cal',emoji:'🌯',flag:'',pair:'Try a side salad?',tags:['all','lowcal']},
+  {tab:'chicken',name:'Chicken Nuggets (9pc)',desc:'Crispy on the outside, tender inside. Pick your dipping sauce.',price:'$5.49',cal:'480 cal',emoji:'🍖',flag:'',pair:'Add BBQ sauce?',tags:['all']},
+  {tab:'chicken',name:'Spicy Tendercrisp',desc:'Whole-muscle chicken breast with BK fiery seasoning.',price:'$8.49',cal:'700 cal',emoji:'🔥',flag:'',pair:'Add jalapenos?',tags:['all','spicy']},
+  // Sides
+  {tab:'sides',name:'Large Fries',desc:'Golden, crispy, lightly salted. Classic never fails.',price:'$3.49',cal:'430 cal',emoji:'🍟',flag:'bestseller',pair:'Add BK sauce?',tags:['all','veggie']},
+  {tab:'sides',name:'Onion Rings',desc:'Beer-battered rings of Vidalia onion. The original side.',price:'$3.99',cal:'410 cal',emoji:'🧅',flag:'fan',pair:'Try our chipotle dip?',tags:['all','veggie']},
+  {tab:'sides',name:'Side Salad',desc:'Mixed greens, cherry tomatoes, cucumber. Light and fresh.',price:'$2.99',cal:'80 cal',emoji:'🥗',flag:'',pair:'Add grilled chicken?',tags:['all','veggie','lowcal']},
+  {tab:'sides',name:'Mac & Cheetos',desc:'Creamy mac in a crispy Cheetos shell. Dangerously addictive.',price:'$3.29',cal:'290 cal',emoji:'🧀',flag:'',pair:'Add a drink?',tags:['all','veggie']},
+  // Drinks
+  {tab:'drinks',name:'Large Coca-Cola',desc:'Ice cold. The perfect flame-grilled companion.',price:'$2.49',cal:'290 cal',emoji:'🥤',flag:'bestseller',pair:'Add a straw?',tags:['all','veggie']},
+  {tab:'drinks',name:'Chocolate Milkshake',desc:'Thick, creamy, hand-spun. Better than the competition.',price:'$3.99',cal:'580 cal',emoji:'🥛',flag:'fan',pair:'Add whipped cream?',tags:['all','veggie']},
+  {tab:'drinks',name:'Fresh Orange Juice',desc:'100% squeezed. No added sugar. Actually orange.',price:'$3.29',cal:'190 cal',emoji:'🍊',flag:'',pair:'',tags:['all','veggie','lowcal']},
+  {tab:'drinks',name:'BK Iced Coffee',desc:'Cold-brew with your choice of milk. Caffeine meets fire.',price:'$3.49',cal:'110 cal',emoji:'☕',flag:'',pair:'Add an extra shot?',tags:['all','veggie','lowcal']},
+  // Desserts
+  {tab:'desserts',name:'OREO® Cheesecake',desc:'Creamy cheesecake on a crumbled OREO base. That simple.',price:'$3.49',cal:'390 cal',emoji:'🍰',flag:'bestseller',pair:'Add a milkshake?',tags:['all','veggie']},
+  {tab:'desserts',name:'Soft Serve Cone',desc:'Classic vanilla soft serve. Simple. Perfect.',price:'$1.49',cal:'170 cal',emoji:'🍦',flag:'',pair:'',tags:['all','veggie','lowcal']},
+  {tab:'desserts',name:'Chocolate Brownie',desc:'Warm, fudgy, with a hint of sea salt. Ends meals right.',price:'$2.99',cal:'450 cal',emoji:'🍫',flag:'fan',pair:'Add ice cream?',tags:['all','veggie']},
+];
+
+/* ─── NAV SCROLL ─── */
+window.addEventListener('scroll',()=>{
+  document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>20);
+});
+
+/* ─── MOBILE MENU ─── */
+const ham=document.getElementById('navHam');
+const mob=document.getElementById('mobileMenu');
+ham.addEventListener('click',()=>{
+  mob.classList.toggle('open');
+  const spans=ham.querySelectorAll('span');
+  if(mob.classList.contains('open')){
+    spans[0].style.transform='rotate(45deg) translate(5px,5px)';
+    spans[1].style.opacity='0';
+    spans[2].style.transform='rotate(-45deg) translate(5px,-5px)';
+  } else {
+    spans.forEach(s=>{s.style.transform='';s.style.opacity=''});
+  }
+});
+function closeMobile(){mob.classList.remove('open');ham.querySelectorAll('span').forEach(s=>{s.style.transform='';s.style.opacity=''})}
+
+/* ─── FLAME PARTICLES ─── */
+const colors=['#D62300','#F5871F','#FF6B00','#FF3300','#FFA500'];
+function spawnFlame(){
+  const c=document.getElementById('flameParticles');
+  if(!c)return;
+  const fp=document.createElement('div');
+  fp.className='fp';
+  fp.style.left=Math.random()*100+'%';
+  fp.style.height=(40+Math.random()*120)+'px';
+  fp.style.background=colors[Math.floor(Math.random()*colors.length)];
+  fp.style.animationDuration=(2+Math.random()*3)+'s';
+  fp.style.animationDelay=(Math.random()*2)+'s';
+  fp.style.width=(1+Math.random()*4)+'px';
+  c.appendChild(fp);
+  setTimeout(()=>fp.remove(),5000);
+}
+setInterval(spawnFlame,200);
+
+/* ─── COUNTDOWN TIMERS ─── */
+function getEndOfDay(){
+  const d=new Date();d.setHours(23,59,59,0);return d;
+}
+const ends=[
+  new Date(getEndOfDay().getTime()),
+  new Date(getEndOfDay().getTime()-3600000),
+  new Date(getEndOfDay().getTime()-7200000),
+];
+function formatTime(ms){
+  if(ms<0)return '00:00:00';
+  const h=Math.floor(ms/3600000);
+  const m=Math.floor((ms%3600000)/60000);
+  const s=Math.floor((ms%60000)/1000);
+  return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':');
+}
+function updateCountdowns(){
+  const now=Date.now();
+  ['cd1','cd2','cd3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el){el.textContent='⏱ '+formatTime(ends[i]-now);}
+  });
+}
+setInterval(updateCountdowns,1000);updateCountdowns();
+
+/* ─── QR MOCK (decorative pattern) ─── */
+const qr=document.getElementById('qrMock');
+if(qr){
+  const pat='11011 10101 11011 00000 11011 10101 11011 01010 11010 11101 10011 10110 10010 11110 11001 11100 10110 10101 11101 10010 11010 00111 10011 10110'.replace(/ /g,'').split('');
+  pat.forEach(b=>{const c=document.createElement('div');c.className='qr-cell'+(b==='0'?' w':'');qr.appendChild(c);});
+}
+
+/* ─── MENU RENDERING ─── */
+let activeTab='burgers';let activeFilter='all';let cart=[];
+function renderMenu(){
+  const grid=document.getElementById('menuGrid');
+  grid.innerHTML='';
+  const filtered=menuItems.filter(i=>i.tab===activeTab&&i.tags.includes(activeFilter));
+  filtered.forEach((item,idx)=>{
+    const card=document.createElement('div');
+    card.className='menu-card show';
+    const grad=item.tab==='burgers'?'linear-gradient(160deg,#2D0000,#0D0000)':
+                item.tab==='chicken'?'linear-gradient(160deg,#2D1400,#0D0600)':
+                item.tab==='sides'?'linear-gradient(160deg,#1A1A00,#080800)':
+                item.tab==='drinks'?'linear-gradient(160deg,#001A2D,#000D18)':
+                'linear-gradient(160deg,#1A0020,#0D0010)';
+    card.style='--card-grad:'+grad;
+    card.innerHTML=`
+      <div class="menu-card-img" style="background:${grad}">
+        <span class="menu-emoji">${item.emoji}</span>
+        ${item.flag==='bestseller'?'<div class="bestseller-flag">Best Seller</div>':''}
+        ${item.flag==='fan'?'<div class="fan-flag">Fan Fave</div>':''}
+      </div>
+      <div class="menu-card-body">
+        <div class="menu-item-name">${item.name}</div>
+        <div class="menu-item-desc">${item.desc}</div>
+        <div class="menu-card-footer">
+          <div>
+            <div class="menu-price">${item.price}</div>
+            <div class="menu-cal">${item.cal}</div>
+          </div>
+          <button class="quick-add" id="qa${idx}" onclick="addToCart('${item.name.replace(/'/g,"\\'")}','${item.price}',${idx})" title="Quick add">+</button>
+        </div>
+      </div>
+      ${item.pair?`<div class="pair-hint">🤝 Pair with: ${item.pair}</div>`:''}
+    `;
+    grid.appendChild(card);
+  });
+  if(filtered.length===0){
+    grid.innerHTML='<div style="grid-column:1/-1;padding:48px;text-align:center;font-family:monospace;font-size:11px;letter-spacing:2px;color:var(--muted)">NO ITEMS MATCH THIS FILTER</div>';
+  }
+}
+
+document.querySelectorAll('.menu-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.menu-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTab=btn.dataset.tab;
+    renderMenu();
+  });
+});
+document.querySelectorAll('.diet-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.diet-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter=btn.dataset.filter;
+    renderMenu();
+  });
+});
+renderMenu();
+
+/* ─── CART ─── */
+function addToCart(name,price,idx){
+  cart.push({name,price});
+  const count=document.getElementById('cartCount');
+  count.textContent=cart.length;
+  count.classList.add('show');
+  // Quick-add flash
+  if(idx!==undefined){
+    const btn=document.getElementById('qa'+idx);
+    if(btn){btn.classList.add('added');btn.textContent='✓';setTimeout(()=>{btn.classList.remove('added');btn.textContent='+';},800);}
+  }
+  showToast(name,price);
+}
+let toastTimer;
+function showToast(name,price){
+  clearTimeout(toastTimer);
+  document.getElementById('toastItem').textContent=name;
+  const total=cart.reduce((s,i)=>s+parseFloat(i.price.replace('$','')),0);
+  document.getElementById('toastTotal').textContent='$'+total.toFixed(2)+' total';
+  const t=document.getElementById('cartToast');
+  t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ─── LOCATION SEARCH ─── */
+function searchLocation(){
+  const v=document.getElementById('locInput').value.trim();
+  if(!v)return;
+  document.getElementById('locInput').value='';
+  alert('Searching for BK locations near "'+v+'" — GPS integration would fire here.');
+}
+function useMyLocation(){
+  alert('Location permission requested — nearest BK restaurants would appear here.');
+}
+
+/* ─── NEWSLETTER ─── */
+function subscribeNewsletter(){
+  const email=document.getElementById('nlEmail').value.trim();
+  if(!email||!email.includes('@')){alert('Please enter a valid email address.');return;}
+  document.getElementById('nlEmail').value='';
+  alert('Welcome to the Kingdom, '+email+'! Check your inbox for your free item code. 🔥');
+}
+
+/* ─── LOC CARD ACTIVE ─── */
+document.querySelectorAll('.loc-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    document.querySelectorAll('.loc-card').forEach(c=>c.classList.remove('active'));
+    card.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
