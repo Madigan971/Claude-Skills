@@ -1,0 +1,778 @@
+<title>Injury Intake Assistant — Demo</title>
+<style>
+  :root {
+    --bg: #eef1f0;
+    --panel: #ffffff;
+    --thread: #f4f6f5;
+    --ink: #16211f;
+    --muted: #5c6b67;
+    --faint: #8a9793;
+    --line: #dfe5e2;
+    --brand: #0f5f57;
+    --brand-strong: #0b4a43;
+    --brand-tint: #e4efec;
+    --on-brand: #f2f8f6;
+    --gold: #a9762f;
+    --urgent: #b4462f;
+    --shadow: 0 18px 50px -22px rgba(15, 46, 42, .45);
+    --radius: 18px;
+    --ff-mark: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --ff-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c1413;
+      --panel: #14201e;
+      --thread: #0f1a18;
+      --ink: #e8efec;
+      --muted: #97a6a1;
+      --faint: #6c7c77;
+      --line: #24322f;
+      --brand: #5fb3a6;
+      --brand-strong: #7cc6ba;
+      --brand-tint: #1a2b28;
+      --on-brand: #06110f;
+      --gold: #d3a35f;
+      --urgent: #e0765c;
+      --shadow: 0 22px 60px -26px rgba(0, 0, 0, .7);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #eef1f0; --panel: #ffffff; --thread: #f4f6f5; --ink: #16211f;
+    --muted: #5c6b67; --faint: #8a9793; --line: #dfe5e2; --brand: #0f5f57;
+    --brand-strong: #0b4a43; --brand-tint: #e4efec; --on-brand: #f2f8f6;
+    --gold: #a9762f; --urgent: #b4462f; --shadow: 0 18px 50px -22px rgba(15,46,42,.45);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c1413; --panel: #14201e; --thread: #0f1a18; --ink: #e8efec;
+    --muted: #97a6a1; --faint: #6c7c77; --line: #24322f; --brand: #5fb3a6;
+    --brand-strong: #7cc6ba; --brand-tint: #1a2b28; --on-brand: #06110f;
+    --gold: #d3a35f; --urgent: #e0765c; --shadow: 0 22px 60px -26px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--ff-ui);
+    color: var(--ink);
+    background:
+      radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--brand) 12%, var(--bg)), var(--bg) 60%);
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 448px;
+    height: min(760px, calc(100dvh - 48px));
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .crest {
+    width: 40px; height: 40px; flex: 0 0 40px;
+    border-radius: 11px;
+    background: linear-gradient(150deg, var(--brand), var(--brand-strong));
+    color: var(--on-brand);
+    display: grid; place-items: center;
+    font-family: var(--ff-mark);
+    font-size: 19px; font-weight: 700;
+    letter-spacing: .01em;
+  }
+  .brand-lines { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .wordmark {
+    font-family: var(--ff-mark);
+    font-size: 17px; font-weight: 700; letter-spacing: .01em;
+    color: var(--ink); line-height: 1.15;
+  }
+  .subrole {
+    font-size: 11.5px; color: var(--muted); letter-spacing: .02em;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .dot-live {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint);
+  }
+  .tag {
+    margin-left: auto; align-self: flex-start;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--muted); border: 1px solid var(--line);
+    padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+  }
+
+  /* Thread */
+  .thread {
+    flex: 1; overflow-y: auto;
+    padding: 20px 16px 8px;
+    background: var(--thread);
+    display: flex; flex-direction: column; gap: 10px;
+    scroll-behavior: smooth;
+  }
+  .row { display: flex; }
+  .row.bot { justify-content: flex-start; }
+  .row.me { justify-content: flex-end; }
+
+  .bubble {
+    max-width: 84%;
+    padding: 11px 14px;
+    border-radius: 15px;
+    font-size: 15px; line-height: 1.5;
+    animation: rise .28s cubic-bezier(.2,.7,.3,1) both;
+  }
+  .bot .bubble {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-bottom-left-radius: 5px;
+    color: var(--ink);
+  }
+  .me .bubble {
+    background: var(--brand);
+    color: var(--on-brand);
+    border-bottom-right-radius: 5px;
+  }
+  .bubble.note {
+    background: transparent;
+    border: 1px dashed color-mix(in srgb, var(--brand) 35%, var(--line));
+    color: var(--muted);
+    font-size: 13px; line-height: 1.5;
+    border-bottom-left-radius: 15px;
+  }
+  .bubble.summary {
+    max-width: 92%;
+    padding: 0; overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 14px;
+    width: 92%;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Typing indicator */
+  .typing { display: inline-flex; gap: 4px; padding: 14px 15px; }
+  .typing i {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--faint);
+    animation: blink 1.2s infinite ease-in-out both;
+  }
+  .typing i:nth-child(2) { animation-delay: .18s; }
+  .typing i:nth-child(3) { animation-delay: .36s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+  /* Composer */
+  .composer {
+    border-top: 1px solid var(--line);
+    background: var(--panel);
+    padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: inherit; font-size: 14px;
+    color: var(--brand-strong);
+    background: var(--brand-tint);
+    border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
+    padding: 9px 14px; border-radius: 999px;
+    cursor: pointer; transition: transform .12s ease, background .12s ease;
+  }
+  .chip:hover { background: color-mix(in srgb, var(--brand) 22%, var(--panel)); transform: translateY(-1px); }
+  .chip:active { transform: translateY(0); }
+
+  .field { display: flex; gap: 8px; align-items: stretch; }
+  .input, .select, .area {
+    font-family: inherit; font-size: 15px; color: var(--ink);
+    background: var(--thread);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 11px 13px; width: 100%;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .area { resize: none; min-height: 46px; line-height: 1.45; }
+  .input:focus, .select:focus, .area:focus {
+    outline: none; border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-tint);
+  }
+  .send {
+    flex: 0 0 auto;
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    color: var(--on-brand); background: var(--brand);
+    border: none; border-radius: 12px; padding: 0 18px;
+    cursor: pointer; transition: background .12s ease;
+  }
+  .send:hover { background: var(--brand-strong); }
+  .send:disabled { opacity: .45; cursor: default; }
+  .hint { font-size: 11.5px; color: var(--faint); padding: 0 2px; }
+
+  /* Summary card internals */
+  .sum-head {
+    padding: 13px 16px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sum-head h3 { margin: 0; font-size: 14px; letter-spacing: .01em; }
+  .badge {
+    margin-left: auto; font-size: 10.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    padding: 4px 9px; border-radius: 999px;
+  }
+  .badge.ok { background: var(--brand-tint); color: var(--brand-strong); }
+  .badge.urgent { background: color-mix(in srgb, var(--urgent) 18%, transparent); color: var(--urgent); }
+  .sum-body { padding: 6px 16px 14px; }
+  .sum-row {
+    display: grid; grid-template-columns: 92px 1fr; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--line);
+    font-size: 13.5px;
+  }
+  .sum-row:last-child { border-bottom: none; }
+  .sum-row .k { color: var(--muted); }
+  .sum-row .v { color: var(--ink); }
+  .sum-actions { padding: 0 16px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-ghost {
+    font-family: inherit; font-size: 13.5px; font-weight: 600;
+    padding: 9px 14px; border-radius: 11px; cursor: pointer;
+    border: 1px solid var(--brand); color: var(--brand);
+    background: transparent; transition: background .12s ease;
+  }
+  .btn-ghost:hover { background: var(--brand-tint); }
+  .btn-solid {
+    font-family: inherit; font-size: 13.5px; font-weight: 600;
+    padding: 9px 14px; border-radius: 11px; cursor: pointer;
+    border: 1px solid var(--brand); color: var(--on-brand);
+    background: var(--brand); transition: background .12s ease;
+  }
+  .btn-solid:hover { background: var(--brand-strong); }
+
+  /* Footer disclaimer */
+  .foot {
+    padding: 8px 16px; font-size: 11px; line-height: 1.4;
+    color: var(--faint); text-align: center;
+    border-top: 1px solid var(--line); background: var(--panel);
+  }
+  .foot b { color: var(--muted); font-weight: 600; }
+
+  .thread::-webkit-scrollbar { width: 8px; }
+  .thread::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--faint) 40%, transparent); border-radius: 8px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bubble { animation: none; }
+    .typing i { animation: none; opacity: .6; }
+    .thread { scroll-behavior: auto; }
+  }
+</style>
+
+<div class="app" role="application" aria-label="Personal injury intake assistant">
+  <header class="head">
+    <div class="crest" aria-hidden="true">M</div>
+    <div class="brand-lines">
+      <div class="wordmark">Meridian Injury Law</div>
+      <div class="subrole"><span class="dot-live"></span> Intake Assistant</div>
+    </div>
+    <span class="tag">Sample / Demo</span>
+  </header>
+
+  <main class="thread" id="thread" aria-live="polite"></main>
+
+  <div class="composer" id="composer"></div>
+
+  <footer class="foot">
+    <b>Not legal advice.</b> Chatting here does not make Meridian your attorney. In a medical emergency, call 911.
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const thread = document.getElementById("thread");
+  const composer = document.getElementById("composer");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const state = {};
+
+  const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming","Outside the U.S."];
+
+  const CASE_TYPES = {
+    car:     { label: "Car or truck accident",  ack: "I'm sorry you were in a crash — that can be frightening and disorienting." },
+    fall:    { label: "Slip, trip & fall",      ack: "I'm sorry you were hurt in a fall. Let's take this one step at a time." },
+    dog:     { label: "Dog bite / animal attack",ack: "A dog attack can be really traumatic. I'm sorry that happened to you." },
+    medical: { label: "Medical injury",         ack: "I'm sorry — being harmed while in someone's care is upsetting. Thank you for trusting us with it." },
+    product: { label: "Defective product",      ack: "I'm sorry a product you trusted ended up hurting you." },
+    nursing: { label: "Nursing home concern",   ack: "I'm sorry — worrying about a loved one's care is painful. I'll be gentle with these questions." },
+    death:   { label: "Loss of a loved one",    ack: "I am so sorry for the loss of your loved one. Please take all the time you need — we can go slowly." },
+    other:   { label: "Something else",         ack: "I'm sorry you're dealing with this. Tell me a little about it and we'll figure out how we can help." }
+  };
+
+  /* ---------- rendering helpers ---------- */
+  function scroll() { thread.scrollTop = thread.scrollHeight; }
+
+  function addBubble(text, who, cls) {
+    const row = document.createElement("div");
+    row.className = "row " + (who === "me" ? "me" : "bot");
+    const b = document.createElement("div");
+    b.className = "bubble" + (cls ? " " + cls : "");
+    b.textContent = text;
+    row.appendChild(b);
+    thread.appendChild(row);
+    scroll();
+    return b;
+  }
+
+  function typing() {
+    const row = document.createElement("div");
+    row.className = "row bot";
+    row.innerHTML = '<div class="bubble" style="padding:0"><span class="typing"><i></i><i></i><i></i></span></div>';
+    thread.appendChild(row);
+    scroll();
+    return row;
+  }
+
+  // Play a sequence of bot messages with typing pauses, then resolve.
+  function botSay(messages) {
+    return new Promise((resolve) => {
+      let i = 0;
+      const next = () => {
+        if (i >= messages.length) return resolve();
+        const t = typing();
+        const msg = messages[i];
+        const delay = reduce ? 220 : Math.min(1100, 350 + msg.text.length * 12);
+        setTimeout(() => {
+          t.remove();
+          addBubble(msg.text, "bot", msg.cls);
+          i++;
+          setTimeout(next, reduce ? 90 : 260);
+        }, delay);
+      };
+      next();
+    });
+  }
+
+  function clearComposer() { composer.innerHTML = ""; }
+
+  function renderChips(options, onPick) {
+    clearComposer();
+    const wrap = document.createElement("div");
+    wrap.className = "chips";
+    options.forEach((opt) => {
+      const c = document.createElement("button");
+      c.className = "chip";
+      c.type = "button";
+      c.textContent = opt.label;
+      c.addEventListener("click", () => onPick(opt));
+      wrap.appendChild(c);
+    });
+    composer.appendChild(wrap);
+  }
+
+  function renderText(opts, onSend) {
+    clearComposer();
+    const field = document.createElement("div");
+    field.className = "field";
+    const multiline = opts.multiline;
+    const input = document.createElement(multiline ? "textarea" : "input");
+    input.className = multiline ? "area" : "input";
+    if (!multiline && opts.inputType) input.type = opts.inputType;
+    input.placeholder = opts.placeholder || "Type your answer…";
+    if (multiline) input.rows = 2;
+    const btn = document.createElement("button");
+    btn.className = "send"; btn.type = "button"; btn.textContent = "Send";
+    const submit = () => {
+      const v = input.value.trim();
+      if (!v && !opts.optional) { input.focus(); return; }
+      onSend(v);
+    };
+    btn.addEventListener("click", submit);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (!multiline || (e.metaKey || e.ctrlKey))) { e.preventDefault(); submit(); }
+    });
+    field.appendChild(input); field.appendChild(btn);
+    composer.appendChild(field);
+    if (opts.hint) {
+      const h = document.createElement("div");
+      h.className = "hint"; h.textContent = opts.hint;
+      composer.appendChild(h);
+    }
+    input.focus();
+  }
+
+  function renderSelect(options, placeholder, onPick) {
+    clearComposer();
+    const field = document.createElement("div");
+    field.className = "field";
+    const sel = document.createElement("select");
+    sel.className = "select";
+    const ph = document.createElement("option");
+    ph.value = ""; ph.textContent = placeholder; ph.disabled = true; ph.selected = true;
+    sel.appendChild(ph);
+    options.forEach((o) => {
+      const op = document.createElement("option");
+      op.value = o; op.textContent = o; sel.appendChild(op);
+    });
+    const btn = document.createElement("button");
+    btn.className = "send"; btn.type = "button"; btn.textContent = "Send"; btn.disabled = true;
+    sel.addEventListener("change", () => { btn.disabled = !sel.value; });
+    btn.addEventListener("click", () => { if (sel.value) onPick(sel.value); });
+    field.appendChild(sel); field.appendChild(btn);
+    composer.appendChild(field);
+  }
+
+  /* ---------- flow ---------- */
+  async function start() {
+    await botSay([
+      { text: "Hi, I'm the intake assistant for Meridian Injury Law. I'm really glad you reached out." },
+      { text: "I'm not an attorney and I can't give legal advice — I'll just ask a few questions so one of our attorneys can see how we might help. Talking with me doesn't make us your lawyers yet.", cls: "note" },
+      { text: "To start, which of these is closest to what happened?" }
+    ]);
+    renderChips(
+      Object.keys(CASE_TYPES).map((k) => ({ value: k, label: CASE_TYPES[k].label })),
+      (opt) => {
+        addBubble(opt.label, "me");
+        state.caseType = opt.value;
+        state.caseLabel = opt.label;
+        askNarrative();
+      }
+    );
+  }
+
+  async function askNarrative() {
+    const t = CASE_TYPES[state.caseType];
+    await botSay([
+      { text: t.ack },
+      { text: "In your own words, can you tell me what happened?" }
+    ]);
+    renderText({ multiline: true, placeholder: "Share as much or as little as you'd like…", hint: "Press ⌘/Ctrl + Enter to send" }, (v) => {
+      addBubble(v, "me");
+      state.narrative = v;
+      askDate();
+    });
+  }
+
+  async function askDate() {
+    await botSay([
+      { text: "Thank you for sharing that." },
+      { text: "About when did this happen? Your best estimate is fine." }
+    ]);
+    renderText({ inputType: "date", placeholder: "Date" }, (v) => {
+      state.dateRaw = v;
+      const d = new Date(v);
+      state.dateLabel = isNaN(d) ? v : d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+      state.daysAgo = isNaN(d) ? null : Math.floor((Date.now() - d.getTime()) / 86400000);
+      addBubble(state.dateLabel, "me");
+      askLocation();
+    });
+  }
+
+  async function askLocation() {
+    await botSay([{ text: "Which state did it happen in? This helps us route you to the right attorney." }]);
+    renderSelect(US_STATES, "Select a state…", (v) => {
+      addBubble(v, "me");
+      state.location = v;
+      askGov();
+    });
+  }
+
+  async function askGov() {
+    await botSay([
+      { text: "One quick question that can matter a lot for timing:" },
+      { text: "Was a government or public entity involved — like a city bus, a public hospital, a government vehicle, or an injury on public property?" }
+    ]);
+    renderChips([
+      { value: "yes", label: "Yes" },
+      { value: "no", label: "No" },
+      { value: "unsure", label: "I'm not sure" }
+    ], (opt) => {
+      addBubble(opt.label, "me");
+      state.gov = opt.value;
+      askInjury();
+    });
+  }
+
+  async function askInjury() {
+    await botSay([{ text: "Have you been able to see a doctor or get medical care for your injuries?" }]);
+    renderChips([
+      { value: "er", label: "Yes — ER / ambulance" },
+      { value: "doctor", label: "Yes — saw a doctor" },
+      { value: "ongoing", label: "Yes — still treating" },
+      { value: "none", label: "Not yet" }
+    ], (opt) => {
+      addBubble(opt.label, "me");
+      state.treatment = opt.label;
+      state.treatedFlag = opt.value !== "none";
+      askFault();
+    });
+  }
+
+  async function askFault() {
+    await botSay([{ text: "Who do you believe was responsible for what happened, and why? (If you're not sure, that's okay — just tell me what you know.)" }]);
+    renderText({ multiline: true, placeholder: "e.g. the other driver ran a red light…", optional: true, hint: "Press ⌘/Ctrl + Enter to send" }, (v) => {
+      addBubble(v || "Not sure yet", "me");
+      state.fault = v || "Not sure";
+      askRepresented();
+    });
+  }
+
+  async function askRepresented() {
+    await botSay([{ text: "Do you currently have another attorney helping you with this matter?" }]);
+    renderChips([
+      { value: "no", label: "No" },
+      { value: "yes", label: "Yes, I already have a lawyer" }
+    ], (opt) => {
+      addBubble(opt.label, "me");
+      state.represented = opt.value;
+      if (opt.value === "yes") { finishRepresented(); }
+      else { askName(); }
+    });
+  }
+
+  async function askName() {
+    await botSay([
+      { text: "That's everything about the incident — thank you for walking me through it." },
+      { text: "So an attorney can follow up, may I have your full name?" }
+    ]);
+    renderText({ placeholder: "Full name" }, (v) => {
+      addBubble(v, "me");
+      state.name = v;
+      askPhone();
+    });
+  }
+
+  async function askPhone() {
+    await botSay([{ text: "And the best phone number to reach you?" }]);
+    renderText({ inputType: "tel", placeholder: "Phone number" }, (v) => {
+      addBubble(v, "me");
+      state.phone = v;
+      askEmail();
+    });
+  }
+
+  async function askEmail() {
+    await botSay([{ text: "An email address too, in case we can't reach you by phone? (Optional — you can skip.)" }]);
+    renderText({ inputType: "email", placeholder: "Email address", optional: true }, (v) => {
+      addBubble(v || "Skipped", "me");
+      state.email = v || "Not provided";
+      askBestTime();
+    });
+  }
+
+  async function askBestTime() {
+    await botSay([{ text: "When is the best time for an attorney to reach you?" }]);
+    renderChips([
+      { value: "Morning", label: "Morning" },
+      { value: "Afternoon", label: "Afternoon" },
+      { value: "Evening", label: "Evening" },
+      { value: "Anytime", label: "Anytime" }
+    ], (opt) => {
+      addBubble(opt.label, "me");
+      state.bestTime = opt.value;
+      askConsent();
+    });
+  }
+
+  async function askConsent() {
+    await botSay([{ text: "Last thing — is it okay for a member of our team to contact you about your case?" }]);
+    renderChips([
+      { value: "yes", label: "Yes, please contact me" },
+      { value: "no", label: "Not right now" }
+    ], (opt) => {
+      addBubble(opt.label, "me");
+      state.consent = opt.value === "yes";
+      finishEscalate();
+    });
+  }
+
+  /* ---------- closings ---------- */
+  function computeUrgent() {
+    const reasons = [];
+    if (state.caseType === "medical") reasons.push("medical-injury matter");
+    if (state.caseType === "death") reasons.push("wrongful-death matter");
+    if (state.gov === "yes") reasons.push("possible government/public entity");
+    if (state.gov === "unsure") reasons.push("government involvement unclear");
+    if (typeof state.daysAgo === "number" && state.daysAgo > 540) reasons.push("incident may be time-sensitive");
+    return reasons;
+  }
+
+  async function finishRepresented() {
+    clearComposer();
+    await botSay([
+      { text: "It sounds like you already have an attorney handling this for you — that's good, and out of respect for that relationship it's best to keep working with them on this matter." },
+      { text: "If anything changes, you're always welcome to reach back out. Take care of yourself." }
+    ]);
+    state.routing = "Already represented — no action";
+    renderRestartOnly();
+  }
+
+  async function finishEscalate() {
+    clearComposer();
+    const urgentReasons = computeUrgent();
+    const urgent = urgentReasons.length > 0;
+    state.urgent = urgent;
+    state.urgentReasons = urgentReasons;
+
+    if (urgent) {
+      state.routing = "Urgent — attorney to call ASAP";
+      await botSay([
+        { text: "Thank you for all of this, " + firstName() + ". I want to get you in front of an attorney as quickly as possible — in situations like yours, timing can really matter." },
+        { text: "I'm marking your intake as urgent so an attorney can reach out to you as soon as possible." }
+      ]);
+    } else {
+      state.routing = "Attorney follow-up scheduled";
+      await botSay([
+        { text: "Thank you for sharing all of that, " + firstName() + " — I'm so sorry you're dealing with it." },
+        { text: "Based on what you've told me, I'd like to have one of our attorneys review your situation with you. Someone from our team will reach out within one business day." }
+      ]);
+    }
+    if (!state.consent) {
+      await botSay([{ text: "You mentioned you're not ready to be contacted yet — that's completely okay. Whenever you're ready, just reach back out and we'll pick up right here." }]);
+    }
+    await botSay([{ text: "Here's a summary of what you shared. You can save a copy for your records." }]);
+    renderSummary();
+  }
+
+  function firstName() {
+    if (!state.name) return "there";
+    return state.name.trim().split(/\s+/)[0];
+  }
+
+  /* ---------- summary ---------- */
+  function renderSummary() {
+    const row = document.createElement("div");
+    row.className = "row bot";
+    const card = document.createElement("div");
+    card.className = "bubble summary";
+
+    const rows = [
+      ["Matter", state.caseLabel],
+      ["Incident", state.dateLabel || "Not provided"],
+      ["Location", state.location || "Not provided"],
+      ["Care", state.treatment || "Not provided"],
+      ["Responsible", trim(state.fault, 60)],
+      ["Contact", contactLine()],
+      ["Best time", state.bestTime || "Not provided"],
+      ["Next step", state.routing]
+    ];
+
+    const badge = state.urgent
+      ? '<span class="badge urgent">Urgent</span>'
+      : '<span class="badge ok">Received</span>';
+
+    card.innerHTML =
+      '<div class="sum-head"><h3>Your intake summary</h3>' + badge + '</div>' +
+      '<div class="sum-body">' +
+      rows.map((r) => '<div class="sum-row"><span class="k">' + esc(r[0]) + '</span><span class="v">' + esc(r[1]) + '</span></div>').join("") +
+      '</div>' +
+      '<div class="sum-actions">' +
+      '<button class="btn-solid" id="dl">Save my summary</button>' +
+      '<button class="btn-ghost" id="restart">Start over</button>' +
+      '</div>';
+
+    row.appendChild(card);
+    thread.appendChild(row);
+    scroll();
+    clearComposer();
+
+    const dl = card.querySelector("#dl");
+    if (window.claude && window.claude.downloads) {
+      dl.addEventListener("click", () => saveSummary(dl));
+    } else {
+      dl.style.display = "none";
+    }
+    card.querySelector("#restart").addEventListener("click", restart);
+  }
+
+  function contactLine() {
+    const bits = [];
+    if (state.name) bits.push(state.name);
+    if (state.phone) bits.push(state.phone);
+    return bits.length ? bits.join(" · ") : "Not provided";
+  }
+
+  function renderRestartOnly() {
+    clearComposer();
+    const wrap = document.createElement("div");
+    wrap.className = "chips";
+    const c = document.createElement("button");
+    c.className = "chip"; c.type = "button"; c.textContent = "Start a new intake";
+    c.addEventListener("click", restart);
+    wrap.appendChild(c);
+    composer.appendChild(wrap);
+  }
+
+  async function saveSummary(btn) {
+    const md = summaryMarkdown();
+    const safe = (firstName() || "intake").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    try {
+      btn.disabled = true; btn.textContent = "Saving…";
+      await window.claude.downloads.save({ filename: "meridian-intake-" + safe + ".md", data: md });
+      btn.textContent = "Saved ✓";
+    } catch (err) {
+      const code = err && err.code;
+      if (code === "declined") { btn.disabled = false; btn.textContent = "Save my summary"; }
+      else if (code === "rate_limited") { btn.textContent = "Please wait…"; setTimeout(() => { btn.disabled = false; btn.textContent = "Save my summary"; }, 1500); }
+      else { btn.style.display = "none"; }
+    }
+  }
+
+  function summaryMarkdown() {
+    const L = [];
+    L.push("# Meridian Injury Law — Intake Summary");
+    L.push("");
+    L.push("_This is a demo intake record. Not legal advice; no attorney-client relationship is formed._");
+    L.push("");
+    if (state.urgent) L.push("> **URGENT** — " + state.urgentReasons.join("; "));
+    L.push("");
+    L.push("- **Matter type:** " + val(state.caseLabel));
+    L.push("- **Date of incident:** " + val(state.dateLabel));
+    L.push("- **Location (state):** " + val(state.location));
+    L.push("- **Government/public entity involved:** " + govText());
+    L.push("- **Medical care:** " + val(state.treatment));
+    L.push("- **Believed responsible:** " + val(state.fault));
+    L.push("- **What happened (client's words):** " + val(state.narrative));
+    L.push("");
+    L.push("## Contact");
+    L.push("- **Name:** " + val(state.name));
+    L.push("- **Phone:** " + val(state.phone));
+    L.push("- **Email:** " + val(state.email));
+    L.push("- **Best time to reach:** " + val(state.bestTime));
+    L.push("- **Consent to contact:** " + (state.consent ? "Yes" : "Not yet"));
+    L.push("");
+    L.push("## Routing");
+    L.push("- **Recommended next step:** " + val(state.routing));
+    L.push("");
+    L.push("_Generated " + new Date().toLocaleString() + "._");
+    return L.join("\n");
+  }
+
+  function govText() {
+    return state.gov === "yes" ? "Yes" : state.gov === "unsure" ? "Unsure" : "No";
+  }
+  function val(v) { return (v === undefined || v === null || v === "") ? "Not provided" : String(v); }
+  function trim(s, n) { s = val(s); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+  function restart() {
+    for (const k in state) delete state[k];
+    thread.innerHTML = "";
+    clearComposer();
+    start();
+  }
+
+  start();
+})();
+</script>
