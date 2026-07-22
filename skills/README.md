@@ -30,6 +30,7 @@ This folder includes a diverse collection of example skills demonstrating differ
 - **brand-guidelines** - Apply Anthropic's official brand colors and typography to artifacts
 - **internal-comms** - Write internal communications like status reports, newsletters, and FAQs
 - **theme-factory** - Style artifacts with 10 pre-set professional themes or generate custom themes on-the-fly
+- **pi-intake-chatbot** - Conduct empathetic, compliant new-client intake for a personal injury law firm: screen prospects, gather accident/injury facts, check timeliness and conflicts, and produce a structured attorney-review summary
 
 ## Meta Skills
 - **skill-creator** - Guide for creating effective skills that extend Claude's capabilities
